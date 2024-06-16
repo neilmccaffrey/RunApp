@@ -95,12 +95,10 @@ export const deletePostFromFirestore = async itemId => {
 //add comments to post doc
 export const addCommentToPost = async (postId, comment) => {
   try {
-    console.log('Comment object:', JSON.stringify(comment, null, 2));
     await firestore()
       .collection('posts')
       .doc(postId)
       .update({comments: firestore.FieldValue.arrayUnion(comment)});
-    console.log('here');
   } catch (error) {
     throw error;
   }

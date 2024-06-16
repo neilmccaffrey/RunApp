@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    height: '40%',
+    height: '60%',
   },
   xButton: {
     position: 'absolute',
@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
   commentContainer: {
     flexDirection: 'row',
     marginBottom: verticalScale(15),
+    flex: 1,
   },
   commentImage: {
     borderWidth: horizontalScale(2),
