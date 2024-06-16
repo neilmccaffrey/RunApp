@@ -16,7 +16,16 @@ end
 
 target 'RunAppNew' do
   config = use_native_modules!
+  use_frameworks! :linkage => :static
+  $RNFirebaseAsStaticFramework = true
+  pod 'Firebase/Core'
+  pod 'Firebase/Auth'
+  pod 'Firebase/Firestore'
+  pod 'Firebase/Storage'
 
+  # Specify nanopb version
+  pod 'nanopb', '< 2.30911.0', '>= 2.30908.0'
+  
   use_react_native!(
     :path => config[:reactNativePath],
     # An absolute path to your application root.
