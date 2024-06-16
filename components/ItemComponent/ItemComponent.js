@@ -308,32 +308,25 @@ const ItemComponent = memo(
             setGoingModal(false);
           }}>
           <TouchableWithoutFeedback onPress={() => setGoingModal(false)}>
-            <View style={styles.overlay}>
-              <View style={styles.modalView}>
-                <FontAwesomeIcon
-                  icon={faXmark}
-                  size={30}
-                  style={styles.xButton}
-                />
-                <View style={styles.flatListContainer}>
-                  <FlatList
-                    showsVerticalScrollIndicator={true}
-                    data={item.isGoing}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={({item}) => {
-                      return (
-                        <View style={styles.goingItems}>
-                          <Text style={styles.goingText}>
-                            {item.displayName}
-                          </Text>
-                        </View>
-                      );
-                    }}
-                  />
-                </View>
-              </View>
-            </View>
+            <View style={styles.overlay} />
           </TouchableWithoutFeedback>
+          <View style={styles.modalView}>
+            <FontAwesomeIcon icon={faXmark} size={30} style={styles.xButton} />
+            <View style={styles.flatListContainer}>
+              <FlatList
+                showsVerticalScrollIndicator={true}
+                data={item.isGoing}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({item}) => {
+                  return (
+                    <View style={styles.goingItems}>
+                      <Text style={styles.goingText}>{item.displayName}</Text>
+                    </View>
+                  );
+                }}
+              />
+            </View>
+          </View>
         </Modal>
       </View>
     );
