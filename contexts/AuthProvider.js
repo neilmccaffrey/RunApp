@@ -68,8 +68,6 @@ export const AuthProvider = ({children}) => {
         }
 
         if (newPhotoURL !== photoURL) {
-          console.log('photo:', photoURL);
-          console.log('NEWphoto:', newPhotoURL);
           const changedUrl = await addProfilePhotoUrlToUserDoc(
             newPhotoURL,
             currentUser,

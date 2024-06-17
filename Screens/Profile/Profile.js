@@ -20,16 +20,14 @@ import {
 } from 'react-native';
 import styles from './styles';
 import globalStyle from '../../Styles/globalStyle';
-import {uploadPhoto} from '../../api/storage';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Toast from 'react-native-toast-message';
 import {useAuth} from '../../contexts/AuthProvider';
 import Button from '../../components/Button/Button';
 import {Routes} from '../../navigation/Routes';
-import {addProfilePhotoUrlToUserDoc} from '../../api/firestore';
 
 const Profile = ({navigation}) => {
-  const {user, logout, updateUserProfile, displayName, photoURL, deletePhoto} =
+  const {logout, updateUserProfile, displayName, photoURL, deletePhoto} =
     useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const [newDisplayName, setNewDisplayName] = useState(displayName);

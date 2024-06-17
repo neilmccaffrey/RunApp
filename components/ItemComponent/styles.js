@@ -73,8 +73,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%', // Full width of the screen
     backgroundColor: 'white',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
     padding: horizontalScale(20),
     shadowColor: '#000',
     shadowOffset: {
