@@ -66,6 +66,7 @@ const styles = StyleSheet.create({
     marginBottom: verticalScale(15),
     flex: 1,
     backgroundColor: '#fff',
+    position: 'relative',
   },
   commentImage: {
     borderWidth: horizontalScale(2),

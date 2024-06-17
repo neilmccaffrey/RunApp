@@ -129,7 +129,7 @@ const Comments = ({isOpen, onClose, postItem}) => {
             data={comments}
             keyExtractor={item => item.commentId.toString()}
             renderHiddenItem={renderHiddenItem}
-            rightOpenValue={-75}
+            rightOpenValue={-150}
             renderItem={({item}) => {
               return (
                 <View style={styles.commentContainer}>
