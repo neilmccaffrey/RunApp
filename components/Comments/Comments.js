@@ -1,5 +1,9 @@
-import React, {useState} from 'react';
-import {faCircleArrowUp, faXmark} from '@fortawesome/free-solid-svg-icons';
+import React, {useEffect, useState} from 'react';
+import {
+  faCircleArrowUp,
+  faTrashCan,
+  faXmark,
+} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {
   Modal,
@@ -15,11 +19,30 @@ import {SwipeListView} from 'react-native-swipe-list-view';
 import {scaleFontSize} from '../../Styles/scaling';
 import Toast from 'react-native-toast-message';
 import {firestore} from '../../firebaseConfig';
-import {addCommentToPost} from '../../api/firestore';
+import {
+  addCommentToPost,
+  deleteComment,
+  fetchComments,
+} from '../../api/firestore';
 import {useAuth} from '../../contexts/AuthProvider';
+import uuid from 'react-native-uuid';
+
 const Comments = ({isOpen, onClose, postItem}) => {
   const {user, displayName, photoURL} = useAuth();
   const [newComment, setNewComment] = useState('');
+  const [comments, setComments] = useState(postItem.comments);
+
+  // Fetch comments initially and whenever the postItem changes
+  useEffect(() => {
+    const loadComments = async () => {
+      if (postItem.id) {
+        const fetchedComments = await fetchComments(postItem.id);
+        setComments(fetchedComments);
+      }
+    };
+
+    loadComments();
+  }, [postItem.id]);
 
   const handleAddComment = async () => {
     if (!newComment.trim()) {
@@ -36,11 +59,14 @@ const Comments = ({isOpen, onClose, postItem}) => {
       photoURL: photoURL || '',
       text: newComment,
       createdAt: firestore.Timestamp.now(), // Create the timestamp explicitly
+      commentId: uuid.v4(),
     };
 
     try {
       await addCommentToPost(postItem.id, comment);
       setNewComment('');
+      const updatedComments = await fetchComments(postItem.id); // Refresh comments after adding a new comment
+      setComments(updatedComments);
       Toast.show({
         type: 'success',
         text1: 'Comment added successfully',
@@ -52,6 +78,32 @@ const Comments = ({isOpen, onClose, postItem}) => {
       });
     }
   };
+
+  const renderHiddenItem = renData => (
+    <View style={styles.hidden}>
+      <TouchableOpacity
+        style={styles.backRightButton}
+        onPress={async () => {
+          try {
+            await deleteComment(postItem.id, renData.item.commentId);
+            const updatedComments = await fetchComments(postItem.id); // Refresh comments after adding a new comment
+            setComments(updatedComments);
+            Toast.show({
+              type: 'success',
+              text1: 'Comment deleted',
+            });
+          } catch (error) {
+            Toast.show({
+              type: 'error',
+              text1: error.message,
+            });
+          }
+        }}>
+        <FontAwesomeIcon icon={faTrashCan} color={'white'} size={20} />
+        <Text style={styles.textColor}>Delete</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <Modal
@@ -74,8 +126,10 @@ const Comments = ({isOpen, onClose, postItem}) => {
                 <Text style={styles.emptyListText}>No comments yet</Text>
               </View>
             }
-            data={postItem.comments}
-            keyExtractor={(item, index) => index.toString()}
+            data={comments}
+            keyExtractor={item => item.commentId.toString()}
+            renderHiddenItem={renderHiddenItem}
+            rightOpenValue={-75}
             renderItem={({item}) => {
               return (
                 <View style={styles.commentContainer}>

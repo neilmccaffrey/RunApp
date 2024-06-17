@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: verticalScale(15),
     flex: 1,
+    backgroundColor: '#fff',
   },
   commentImage: {
     borderWidth: horizontalScale(2),
@@ -83,6 +84,27 @@ const styles = StyleSheet.create({
   commentText: {
     color: '#36454F',
     fontSize: scaleFontSize(18),
+  },
+  hidden: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingLeft: 15,
+  },
+  backRightButton: {
+    alignItems: 'center',
+    bottom: 0,
+    justifyContent: 'center',
+    position: 'absolute',
+    top: 0,
+    width: 75,
+    backgroundColor: '#FF0000',
+    right: 0,
+    marginBottom: verticalScale(16),
+  },
+  textColor: {
+    color: 'white',
   },
 });
 

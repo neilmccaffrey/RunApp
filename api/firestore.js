@@ -105,6 +105,35 @@ export const addCommentToPost = async (postId, comment) => {
   }
 };
 
+//fetch comments
+export const fetchComments = async postItemId => {
+  try {
+    const postRef = firestore().collection('posts').doc(postItemId);
+    const postDoc = await postRef.get();
+    const postData = postDoc.data();
+    return postData.comments;
+  } catch (error) {
+    console.error('Error fetching comments:', error);
+  }
+};
+
+//delete comment
+export const deleteComment = async (postId, commentId) => {
+  try {
+    const postRef = firestore().collection('posts').doc(postId);
+    const postDoc = await postRef.get();
+    const postData = postDoc.data();
+
+    const updatedComments = postData.comments.filter(
+      comment => comment.commentId !== commentId,
+    );
+
+    await postRef.update({comments: updatedComments});
+  } catch (error) {
+    throw error;
+  }
+};
+
 //upload profile photo and add profile photo url to users doc
 export const addProfilePhotoUrlToUserDoc = async (photoUri, user) => {
   try {
