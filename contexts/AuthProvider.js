@@ -68,11 +68,16 @@ export const AuthProvider = ({children}) => {
         }
 
         if (newPhotoURL !== photoURL) {
-          await addProfilePhotoUrlToUserDoc({url: newPhotoURL}, currentUser);
+          console.log('photo:', photoURL);
+          console.log('NEWphoto:', newPhotoURL);
+          const changedUrl = await addProfilePhotoUrlToUserDoc(
+            newPhotoURL,
+            currentUser,
+          );
+          setPhotoURL(changedUrl);
         }
 
         setDisplayName(newDisplayName);
-        setPhotoURL(newPhotoURL);
       }
     } catch (error) {
       console.error('Error updating user profile:', error);

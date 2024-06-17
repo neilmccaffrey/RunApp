@@ -1,4 +1,5 @@
 import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
 import Toast from 'react-native-toast-message';
 
 export const createPost = async (
@@ -104,12 +105,22 @@ export const addCommentToPost = async (postId, comment) => {
   }
 };
 
-//add profile photo url to users doc
-export const addProfilePhotoUrlToUserDoc = async (profilePhoto, user) => {
+//upload profile photo and add profile photo url to users doc
+export const addProfilePhotoUrlToUserDoc = async (photoUri, user) => {
   try {
+    const uploadUri = photoUri.replace('file://', ''); // Ensure the file path is correctly formatted
+    const photoRef = storage().ref(`/profile_photos/${user.uid}.jpg`);
+
+    // Upload the new photo, which will overwrite the existing one
+    await photoRef.putFile(uploadUri);
+    const newPhotoUrl = await photoRef.getDownloadURL();
+
+    // Update the profile photo URL in Firestore
     await firestore().collection('users').doc(user.uid).update({
-      profilePhoto: profilePhoto.url,
+      profilePhoto: newPhotoUrl,
     });
+
+    return newPhotoUrl;
   } catch (error) {
     throw error;
   }
@@ -131,7 +142,7 @@ export const fetchProfilePhoto = async user => {
   }
 };
 
-// fetch profile photo with userId
+// fetch profile photo with userId (for item component)
 export const fetchProfilePhotoWithId = async userUid => {
   try {
     const userDoc = await firestore().collection('users').doc(userUid).get();

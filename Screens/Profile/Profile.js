@@ -26,9 +26,10 @@ import Toast from 'react-native-toast-message';
 import {useAuth} from '../../contexts/AuthProvider';
 import Button from '../../components/Button/Button';
 import {Routes} from '../../navigation/Routes';
+import {addProfilePhotoUrlToUserDoc} from '../../api/firestore';
 
 const Profile = ({navigation}) => {
-  const {logout, updateUserProfile, displayName, photoURL, deletePhoto} =
+  const {user, logout, updateUserProfile, displayName, photoURL, deletePhoto} =
     useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const [newDisplayName, setNewDisplayName] = useState(displayName);
@@ -47,12 +48,8 @@ const Profile = ({navigation}) => {
         const selectedPhoto = response.assets[0];
         //upload profile photo to storage
         try {
-          const uploadedPhoto = await uploadPhoto(
-            selectedPhoto.uri,
-            selectedPhoto.fileName,
-          );
           //update photo using context
-          await await updateUserProfile(newDisplayName, uploadedPhoto.url);
+          await updateUserProfile(newDisplayName, selectedPhoto.uri);
         } catch (error) {
           Toast.show({
             type: 'error',
@@ -76,13 +73,8 @@ const Profile = ({navigation}) => {
       } else if (response.assets && response.assets.length > 0) {
         const takenPhoto = response.assets[0];
         try {
-          // Upload profile photo to storage
-          const uploadedPhoto = await uploadPhoto(
-            takenPhoto.uri,
-            takenPhoto.fileName,
-          );
           //update photo using context
-          await updateUserProfile(newDisplayName, uploadedPhoto.url);
+          await updateUserProfile(newDisplayName, takenPhoto.uri);
         } catch (error) {
           Toast.show({
             type: 'error',
