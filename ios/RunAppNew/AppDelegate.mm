@@ -1,6 +1,6 @@
 #import "AppDelegate.h"
 #import <Firebase.h>
-
+#import "RNFBMessagingModule.h"
 #import <React/RCTBundleURLProvider.h>
 
 @implementation AppDelegate
@@ -30,4 +30,7 @@
 #endif
 }
 
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+  [FIRMessaging messaging].APNSToken = deviceToken;
+}
 @end

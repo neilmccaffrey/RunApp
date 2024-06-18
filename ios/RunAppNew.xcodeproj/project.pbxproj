@@ -32,6 +32,7 @@
 		00E356EE1AD99517003FC87E /* RunAppNewTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunAppNewTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* RunAppNewTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RunAppNewTests.m; sourceTree = "<group>"; };
+		0EBA333B2C21DEEF008D5240 /* RunAppNew.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = RunAppNew.entitlements; path = RunAppNew/RunAppNew.entitlements; sourceTree = "<group>"; };
 		0EEE8BFB2C1DC8D3002F87DF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* RunAppNew.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RunAppNew.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RunAppNew/AppDelegate.h; sourceTree = "<group>"; };
@@ -91,6 +92,7 @@
 		13B07FAE1A68108700A75B9A /* RunAppNew */ = {
 			isa = PBXGroup;
 			children = (
+				0EBA333B2C21DEEF008D5240 /* RunAppNew.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				0EEE8BFB2C1DC8D3002F87DF /* GoogleService-Info.plist */,
@@ -489,6 +491,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = RunAppNew/RunAppNew.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = B54CGALKA2;
 				ENABLE_BITCODE = NO;
@@ -517,6 +520,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = RunAppNew/RunAppNew.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = B54CGALKA2;
 				INFOPLIST_FILE = RunAppNew/Info.plist;

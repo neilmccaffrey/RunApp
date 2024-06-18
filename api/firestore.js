@@ -239,10 +239,13 @@ export const fetchDisplayName = async userUid => {
   }
 };
 
+// update attendance and also event sign up for notifications
 export const updateAttendanceInFirestore = async (
   postId,
   user,
   newAttendanceButtonState,
+  eventLocation,
+  eventTime,
 ) => {
   try {
     const postRef = firestore().collection('posts').doc(postId);
@@ -260,10 +263,35 @@ export const updateAttendanceInFirestore = async (
             uid: user.uid,
             displayName: displayName || user.displayName,
           });
+          //set up notification when user is attending
+          const notificationTime = new Date(
+            eventTime.getTime() - 24 * 60 * 60 * 1000,
+          ); // 24 hours before event
+
+          firestore().collection('event_signups').add({
+            postId: postId,
+            userId: user.uid,
+            displayName: displayName,
+            eventLocation: eventLocation,
+            eventTime: eventTime,
+            notificationTime: notificationTime,
+            notified: false,
+          });
         }
       } else {
         // User is already attending, remove them
         isGoingList = isGoingList.filter(attendee => attendee.uid !== user.uid);
+
+        // Remove the user's notification signup
+        const signupsRef = firestore().collection('event_signups');
+        const signupSnapshot = await signupsRef
+          .where('postId', '==', postId)
+          .where('userId', '==', user.uid)
+          .get();
+
+        signupSnapshot.forEach(async doc => {
+          await doc.ref.delete();
+        });
       }
       await postRef.update({isGoing: isGoingList});
     }
@@ -280,10 +308,6 @@ export const updateAttendanceInFirestore = async (
  */
 export const fetchDisplayNamesForAttendees = async isGoingList => {
   try {
-    // if (!Array.isArray(isGoingList)) {
-    //   throw new Error('isGoingList is not an array');
-    // }
-
     const attendeesWithDisplayNames = await Promise.all(
       isGoingList.map(async attendee => {
         const displayName = await fetchDisplayName(attendee.uid);

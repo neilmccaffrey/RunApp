@@ -22,6 +22,7 @@ target 'RunAppNew' do
   pod 'Firebase/Auth'
   pod 'Firebase/Firestore'
   pod 'Firebase/Storage'
+  pod 'Firebase/Messaging'
 
   # Specify nanopb version
   pod 'nanopb', '< 2.30911.0', '>= 2.30908.0'

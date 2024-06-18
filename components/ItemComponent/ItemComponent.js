@@ -147,11 +147,13 @@ const ItemComponent = memo(
         // Determine the new state based on the current state
         const newAttendanceButtonState = !attendanceButton;
 
-        // Call the API function to update Firestore
+        // Call the API function to update Firestore ** This will also sign the user up to receive a notification **
         await updateAttendanceInFirestore(
           item.id,
           user,
           newAttendanceButtonState,
+          item.location,
+          item.time,
         );
 
         // Update the attendance button state after Firestore update
@@ -311,7 +313,13 @@ const ItemComponent = memo(
             <View style={styles.overlay} />
           </TouchableWithoutFeedback>
           <View style={styles.modalView}>
-            <FontAwesomeIcon icon={faXmark} size={30} style={styles.xButton} />
+            <TouchableOpacity onPress={() => setGoingModal(false)}>
+              <FontAwesomeIcon
+                icon={faXmark}
+                size={30}
+                style={styles.xButton}
+              />
+            </TouchableOpacity>
             <View style={styles.flatListContainer}>
               <FlatList
                 showsVerticalScrollIndicator={true}
