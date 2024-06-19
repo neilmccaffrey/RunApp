@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>org.reactjs.native.example.RunApp</string>
+	<string>com.Run401</string>
 	<key>PROJECT_ID</key>
 	<string>run401-fe9b3</string>
 	<key>STORAGE_BUCKET</key>
