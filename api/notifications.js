@@ -6,9 +6,9 @@ export async function requestUserPermission() {
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
     authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-  if (enabled) {
-    console.log('Authorization status:', authStatus);
-  }
+  // if (enabled) {
+  //   console.log('Authorization status:', authStatus);
+  // }
 }
 
 // Get FCM token

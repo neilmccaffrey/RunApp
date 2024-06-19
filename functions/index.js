@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 admin.initializeApp();
+import dateFormat from 'dateformat';
 
 exports.sendScheduledNotifications = functions.pubsub
   .schedule('every 10 minutes')
@@ -15,8 +16,10 @@ exports.sendScheduledNotifications = functions.pubsub
     snapshot.forEach(async doc => {
       const signup = doc.data();
       await sendNotification(
-        signup.displayName,
-        `Your event ${signup.eventLocation} starts in 24 hours!`,
+        `Tomorrow ${signup.eventLocation} @ ${dateFormat(
+          signup.eventTime,
+          'h:MM TT',
+        )}!`,
       );
       await doc.ref.update({notified: true}); // Mark as notified
     });
