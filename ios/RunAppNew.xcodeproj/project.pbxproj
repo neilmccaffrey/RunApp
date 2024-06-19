@@ -13,6 +13,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		9607E16D1BE74625B4EA5A5C /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C81592AD386A4FFCB0439DFD /* BootSplash.storyboard */; };
 		C84C0BEC4166B4B3F7046C01 /* Pods_RunAppNew.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 845706D50E7E1396154AA054 /* Pods_RunAppNew.framework */; };
 		E98CC11CDCED72EDC3C09F70 /* Pods_RunAppNew_RunAppNewTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 945F1294D290B1DB4926ECB1 /* Pods_RunAppNew_RunAppNewTests.framework */; };
 		FEC0593AFBEFA8F7D9050041 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 5C358F6C39FBE99B554DC0A7 /* PrivacyInfo.xcprivacy */; };
@@ -49,6 +50,7 @@
 		845706D50E7E1396154AA054 /* Pods_RunAppNew.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunAppNew.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-RunAppNew-RunAppNewTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunAppNew-RunAppNewTests.release.xcconfig"; path = "Target Support Files/Pods-RunAppNew-RunAppNewTests/Pods-RunAppNew-RunAppNewTests.release.xcconfig"; sourceTree = "<group>"; };
 		945F1294D290B1DB4926ECB1 /* Pods_RunAppNew_RunAppNewTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunAppNew_RunAppNewTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C81592AD386A4FFCB0439DFD /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = RunAppNew/BootSplash.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -102,6 +104,7 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 				5C358F6C39FBE99B554DC0A7 /* PrivacyInfo.xcprivacy */,
+				C81592AD386A4FFCB0439DFD /* BootSplash.storyboard */,
 			);
 			name = RunAppNew;
 			sourceTree = "<group>";
@@ -256,6 +259,7 @@
 				0E7964372C232A0A0025E206 /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				FEC0593AFBEFA8F7D9050041 /* PrivacyInfo.xcprivacy in Resources */,
+				9607E16D1BE74625B4EA5A5C /* BootSplash.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -492,8 +496,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = RunAppNew/RunAppNew.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B54CGALKA2;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = RunAppNew/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -509,6 +515,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.Run401;
 				PRODUCT_NAME = RunAppNew;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -522,8 +529,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = RunAppNew/RunAppNew.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = B54CGALKA2;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = RunAppNew/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -538,6 +547,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.Run401;
 				PRODUCT_NAME = RunAppNew;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

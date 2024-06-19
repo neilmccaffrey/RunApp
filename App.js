@@ -6,6 +6,7 @@ import {AuthProvider} from './contexts/AuthProvider';
 import {ProfilePhotoProvider} from './contexts/ProfilePhotoContext';
 import {requestUserPermission} from './api/notifications';
 import messaging from '@react-native-firebase/messaging';
+import BootSplash from 'react-native-bootsplash';
 
 const App = () => {
   useEffect(() => {
@@ -30,7 +31,7 @@ const App = () => {
   return (
     <AuthProvider>
       <ProfilePhotoProvider>
-        <NavigationContainer>
+        <NavigationContainer onReady={() => BootSplash.hide()}>
           <MainNavigation />
         </NavigationContainer>
         <Toast />
