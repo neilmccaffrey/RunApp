@@ -58,8 +58,7 @@ const Home = ({navigation}) => {
             return {
               id: doc.id,
               ...postData,
-              date: convertTimestampToDate(postData.date),
-              time: convertTimestampToDate(postData.time),
+              eventTime: convertTimestampToDate(postData.eventTime),
               isGoing: attendeesWithDisplayNames,
             };
           }),
@@ -91,8 +90,7 @@ const Home = ({navigation}) => {
             return {
               id: doc.id,
               ...postData,
-              date: convertTimestampToDate(postData.date),
-              time: convertTimestampToDate(postData.time),
+              eventTime: convertTimestampToDate(postData.eventTime),
               isGoing: attendeesWithDisplayNames,
             };
           }),
@@ -136,8 +134,7 @@ const Home = ({navigation}) => {
           return {
             id: doc.id,
             ...postData,
-            date: convertTimestampToDate(postData.date),
-            time: convertTimestampToDate(postData.time),
+            eventTime: convertTimestampToDate(postData.eventTime),
             isGoing: attendeesWithDisplayNames,
           };
         }),

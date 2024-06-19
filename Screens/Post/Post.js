@@ -120,7 +120,16 @@ const Post = ({navigation}) => {
     }
   };
 
-  const handlePress = () => {
+  const combineDateAndTime = (date, time) => {
+    const combinedDate = new Date(date);
+    combinedDate.setHours(time.getHours());
+    combinedDate.setMinutes(time.getMinutes());
+    combinedDate.setSeconds(time.getSeconds());
+    combinedDate.setMilliseconds(time.getMilliseconds());
+    return combinedDate;
+  };
+
+  const handlePress = eventTime => {
     if (!location) {
       setNoLocation(true);
     } else {
@@ -129,8 +138,7 @@ const Post = ({navigation}) => {
         title,
         location,
         details,
-        date,
-        time,
+        eventTime,
         photo1,
         photo2,
         photo3,
@@ -287,7 +295,10 @@ const Post = ({navigation}) => {
           {/* Send post with date and time formatted */}
           <Button
             title={'Post'}
-            onPress={handlePress}
+            onPress={() => {
+              const combinedEventTime = combineDateAndTime(date, time);
+              handlePress(combinedEventTime);
+            }}
             isDisabled={isUploading}
           />
         </View>

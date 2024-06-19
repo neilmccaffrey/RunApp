@@ -1,14 +1,24 @@
-import React from 'react';
-import {Image, Text, TouchableOpacity, View} from 'react-native';
+import React, {useState} from 'react';
+import {Alert, Image, Text, TouchableOpacity, View} from 'react-native';
 import styles from './styles';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faPenToSquare} from '@fortawesome/free-solid-svg-icons';
 import {Routes} from '../../navigation/Routes';
 import {horizontalScale} from '../../Styles/scaling';
 import {useAuth} from '../../contexts/AuthProvider';
+import messaging from '@react-native-firebase/messaging';
 
 const Header = ({navigation}) => {
   const {photoURL} = useAuth();
+  const [fcmToken, setFcmToken] = useState('');
+
+  const getToken = async () => {
+    const token = await messaging().getToken();
+    if (token) {
+      setFcmToken(token);
+      Alert.alert('FCM Token', token); // Display the token in an alert
+    }
+  };
 
   return (
     <>
@@ -22,6 +32,12 @@ const Header = ({navigation}) => {
             <View style={styles.photo} />
           )}
           <Text style={styles.text}>Profile</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            getToken();
+          }}>
+          <Text>Get Token</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.profile}

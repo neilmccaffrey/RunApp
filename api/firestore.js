@@ -7,8 +7,7 @@ export const createPost = async (
   title,
   location,
   details,
-  date,
-  time,
+  eventTime,
   photo1,
   photo2,
   photo3,
@@ -24,8 +23,7 @@ export const createPost = async (
         title,
         location,
         details,
-        date,
-        time,
+        eventTime,
         photo1: photo1 || null,
         photo2: photo2 || null,
         photo3: photo3 || null,
@@ -53,8 +51,7 @@ export const updatePostInFirestore = async ({
   title,
   location,
   details,
-  date,
-  time,
+  eventTime,
   photo1,
   photo2,
   photo3,
@@ -71,8 +68,7 @@ export const updatePostInFirestore = async ({
         title,
         location,
         details,
-        date,
-        time,
+        eventTime,
         photo1: photo1 || null,
         photo2: photo2 || null,
         photo3: photo3 || null,
@@ -239,7 +235,7 @@ export const fetchDisplayName = async userUid => {
   }
 };
 
-// update attendance and also event sign up for notifications
+// update attendance and also event signup for notifications
 export const updateAttendanceInFirestore = async (
   postId,
   user,
@@ -297,6 +293,26 @@ export const updateAttendanceInFirestore = async (
     }
   } catch (error) {
     console.error('Error updating attendance in Firestore:', error);
+    throw error;
+  }
+};
+
+export const updateNotificationTimes = async (eventTime, id) => {
+  try {
+    const eventSignupsRef = firestore().collection('event_signups');
+    const snapshot = await eventSignupsRef.where('postId', '==', id).get();
+
+    const batch = firestore().batch();
+    const notificationTime = new Date(
+      eventTime.getTime() - 24 * 60 * 60 * 1000,
+    ); // 24 hours before event
+
+    snapshot.forEach(doc => {
+      batch.update(doc.ref, {notificationTime, eventTime});
+    });
+
+    await batch.commit();
+  } catch (error) {
     throw error;
   }
 };

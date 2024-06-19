@@ -119,7 +119,7 @@ const ItemComponent = memo(
 
     const handleEdit = item => {
       setModalVisible(false);
-      const {id, title, location, details, date, time, photo1, photo2, photo3} =
+      const {id, title, location, details, eventTime, photo1, photo2, photo3} =
         item;
 
       navigation.navigate(Routes.UpdatePost, {
@@ -127,8 +127,7 @@ const ItemComponent = memo(
         title,
         location,
         details,
-        date: date.toISOString(), // Convert Date to string
-        time: time.toISOString(), // Convert Date to string
+        eventTime: eventTime.toISOString(), // Convert Date to string
         photo1,
         photo2,
         photo3,
@@ -153,7 +152,7 @@ const ItemComponent = memo(
           user,
           newAttendanceButtonState,
           item.location,
-          item.time,
+          item.eventTime,
         );
 
         // Update the attendance button state after Firestore update
@@ -191,10 +190,10 @@ const ItemComponent = memo(
           <Text style={styles.titleText}>{item.title}</Text>
           <View style={styles.dateTimeContainer}>
             <Text style={styles.dateTimeLocationText}>
-              {dateFormat(item.date, 'ddd mmmm dS, yyyy')}
+              {dateFormat(item.eventTime, 'ddd mmmm dS, yyyy')}
             </Text>
             <Text style={[styles.dateTimeSpacer, styles.dateTimeLocationText]}>
-              @{dateFormat(item.time, 'h:MM TT')}
+              @{dateFormat(item.eventTime, 'h:MM TT')}
             </Text>
           </View>
           <Text style={styles.dateTimeLocationText}>

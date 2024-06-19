@@ -23,7 +23,10 @@ import Button from '../../components/Button/Button';
 import styles from './styles';
 import globalStyle from '../../Styles/globalStyle';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import {updatePostInFirestore} from '../../api/firestore';
+import {
+  updateNotificationTimes,
+  updatePostInFirestore,
+} from '../../api/firestore';
 
 const UpdatePost = () => {
   const navigation = useNavigation();
@@ -33,18 +36,20 @@ const UpdatePost = () => {
     title: initialTitle,
     location: initialLocation,
     details: initialDetails,
-    date: initialDate,
-    time: initialTime,
+    eventTime: initialEventTime,
     photo1: initialPhoto1,
     photo2: initialPhoto2,
     photo3: initialPhoto3,
   } = route.params;
 
+  const initialDate = new Date(initialEventTime);
+  const initialTime = new Date(initialEventTime);
+
   const [title, setTitle] = useState(initialTitle || '');
   const [location, setLocation] = useState(initialLocation || '');
   const [details, setDetails] = useState(initialDetails || '');
-  const [date, setDate] = useState(new Date(initialDate)); // Convert string to Date
-  const [time, setTime] = useState(new Date(initialTime)); // Convert string to Date
+  const [date, setDate] = useState(initialDate);
+  const [time, setTime] = useState(initialTime);
   const [photo1, setPhoto1] = useState(initialPhoto1 || null);
   const [photo2, setPhoto2] = useState(initialPhoto2 || null);
   const [photo3, setPhoto3] = useState(initialPhoto3 || null);
@@ -98,8 +103,17 @@ const UpdatePost = () => {
     });
   };
 
+  const combineDateAndTime = (date, time) => {
+    const combinedDate = new Date(date);
+    combinedDate.setHours(time.getHours());
+    combinedDate.setMinutes(time.getMinutes());
+    combinedDate.setSeconds(time.getSeconds());
+    combinedDate.setMilliseconds(time.getMilliseconds());
+    return combinedDate;
+  };
+
   // Delete photo
-  const handleDeletePhoto = async photoNum => {
+  const handleDeletePhoto = async (photoNum, eventTime) => {
     try {
       let updatedPhotos = {};
 
@@ -123,8 +137,7 @@ const UpdatePost = () => {
         title,
         location,
         details,
-        date,
-        time,
+        eventTime,
         ...updatedPhotos,
       });
     } catch (error) {
@@ -135,20 +148,23 @@ const UpdatePost = () => {
     }
   };
 
-  const handleUpdate = async () => {
+  const handleUpdate = async eventTime => {
     try {
       await updatePostInFirestore({
         id,
         title,
         location,
         details,
-        date,
-        time,
+        eventTime,
         photo1: photo1,
         photo2: photo2,
         photo3: photo3,
         user,
       });
+
+      // Update notification times for all users signed up for this event
+      await updateNotificationTimes(eventTime, id);
+
       Toast.show({
         type: 'success',
         text1: 'Event updated successfully',
@@ -260,7 +276,10 @@ const UpdatePost = () => {
                 <Image source={{uri: photo1.url}} style={styles.photo} />
                 <TouchableOpacity
                   style={styles.trashCan}
-                  onPress={() => handleDeletePhoto('1')}>
+                  onPress={() => {
+                    const combinedEventTime = combineDateAndTime(date, time);
+                    handleDeletePhoto('1', combinedEventTime);
+                  }}>
                   <FontAwesomeIcon
                     icon={faTrashCan}
                     color={'white'}
@@ -282,7 +301,10 @@ const UpdatePost = () => {
                 <Image source={{uri: photo2.url}} style={styles.photo} />
                 <TouchableOpacity
                   style={styles.trashCan}
-                  onPress={() => handleDeletePhoto('2')}>
+                  onPress={() => {
+                    const combinedEventTime = combineDateAndTime(date, time);
+                    handleDeletePhoto('2', combinedEventTime);
+                  }}>
                   <FontAwesomeIcon
                     icon={faTrashCan}
                     color={'white'}
@@ -304,7 +326,10 @@ const UpdatePost = () => {
                 <Image source={{uri: photo3.url}} style={styles.photo} />
                 <TouchableOpacity
                   style={styles.trashCan}
-                  onPress={() => handleDeletePhoto('3')}>
+                  onPress={() => {
+                    const combinedEventTime = combineDateAndTime(date, time);
+                    handleDeletePhoto('3', combinedEventTime);
+                  }}>
                   <FontAwesomeIcon
                     icon={faTrashCan}
                     color={'white'}
@@ -317,7 +342,10 @@ const UpdatePost = () => {
 
           <Button
             title={'Update'}
-            onPress={handleUpdate}
+            onPress={() => {
+              const combinedEventTime = combineDateAndTime(date, time);
+              handleUpdate(combinedEventTime);
+            }}
             isDisabled={isUploading}
           />
         </View>
