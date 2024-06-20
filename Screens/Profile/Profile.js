@@ -49,6 +49,7 @@ const Profile = ({navigation}) => {
         try {
           //update photo using context
           await updateUserProfile(newDisplayName, selectedPhoto.uri);
+          setModalVisible(false);
         } catch (error) {
           Toast.show({
             type: 'error',
@@ -92,6 +93,7 @@ const Profile = ({navigation}) => {
           try {
             // Update photo using context
             await updateUserProfile(newDisplayName, takenPhoto.uri);
+            setModalVisible(false); // Close the modal after successful operation
           } catch (error) {
             Toast.show({
               type: 'error',
@@ -196,7 +198,6 @@ const Profile = ({navigation}) => {
                 style={styles.modalOptions}
                 onPress={() => {
                   selectPhoto();
-                  setModalVisible(false);
                 }}>
                 <FontAwesomeIcon icon={faImage} size={30} color={'#B57EDC'} />
                 <Text style={styles.modalOptionsText}>Choose from library</Text>
@@ -206,7 +207,6 @@ const Profile = ({navigation}) => {
                 style={styles.modalOptions}
                 onPress={() => {
                   takePhoto();
-                  setModalVisible(false);
                 }}>
                 <FontAwesomeIcon icon={faCamera} size={30} color={'#B57EDC'} />
                 <Text style={styles.modalOptionsText}>Take photo</Text>

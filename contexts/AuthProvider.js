@@ -30,7 +30,6 @@ export const AuthProvider = ({children}) => {
         setDisplayName(initialName);
         setPhotoURL(initialPhoto);
         await AsyncStorage.setItem('user', JSON.stringify(user));
-        console.log('User signed in and stored:', user);
       } catch (error) {
         Toast.show({
           type: 'error',
@@ -42,7 +41,6 @@ export const AuthProvider = ({children}) => {
       setDisplayName('');
       setPhotoURL(null);
       await AsyncStorage.removeItem('user');
-      console.log('User signed out and removed from AsyncStorage');
     }
     if (initializing) {
       setInitializing(false);
@@ -63,7 +61,6 @@ export const AuthProvider = ({children}) => {
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           setUser(parsedUser);
-          console.log('Loaded user from AsyncStorage:', parsedUser);
         }
       } catch (error) {
         console.error('Failed to load user:', error);
@@ -86,7 +83,6 @@ export const AuthProvider = ({children}) => {
       setDisplayName(initialName);
       setPhotoURL(initialPhoto);
       await AsyncStorage.setItem('user', JSON.stringify(user));
-      console.log('User logged in and stored:', user);
     } catch (error) {
       Toast.show({
         type: 'error',
@@ -103,7 +99,6 @@ export const AuthProvider = ({children}) => {
       setDisplayName('');
       setPhotoURL(null);
       await AsyncStorage.removeItem('user');
-      console.log('User logged out and removed from AsyncStorage');
     } catch (error) {
       console.error('Error during logout:', error);
       throw error;
