@@ -14,14 +14,16 @@ import {ActivityIndicator, View} from 'react-native';
 const Stack = createStackNavigator();
 
 const MainNavigation = () => {
-  const {user} = useAuth();
+  const {user, initializing} = useAuth();
   const [initialRoute, setInitialRoute] = useState(null);
 
   useEffect(() => {
-    setInitialRoute(user ? Routes.Home : Routes.Login);
-  }, [user]);
+    if (!initializing) {
+      setInitialRoute(user ? Routes.Home : Routes.Login);
+    }
+  }, [user, initializing]);
 
-  if (!initialRoute) {
+  if (initializing || !initialRoute) {
     // Render a loading indicator while determining initial route
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>

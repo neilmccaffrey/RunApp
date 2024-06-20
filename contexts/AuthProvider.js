@@ -18,60 +18,92 @@ export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
   const [displayName, setDisplayName] = useState('');
   const [photoURL, setPhotoURL] = useState(null);
+  const [initializing, setInitializing] = useState(true);
+
+  // Handle user state changes
+  const onAuthStateChanged = async user => {
+    if (user) {
+      try {
+        const initialName = await fetchInitialDisplayName(user);
+        const initialPhoto = await fetchProfilePhoto(user);
+        setUser(user);
+        setDisplayName(initialName);
+        setPhotoURL(initialPhoto);
+        await AsyncStorage.setItem('user', JSON.stringify(user));
+        console.log('User signed in and stored:', user);
+      } catch (error) {
+        Toast.show({
+          type: 'error',
+          text1: error.message,
+        });
+      }
+    } else {
+      setUser(null);
+      setDisplayName('');
+      setPhotoURL(null);
+      await AsyncStorage.removeItem('user');
+      console.log('User signed out and removed from AsyncStorage');
+    }
+    if (initializing) {
+      setInitializing(false);
+    }
+  };
 
   // Listen for authentication state changes
   useEffect(() => {
-    const unsubscribe = auth().onAuthStateChanged(async user => {
-      if (user) {
-        try {
-          const initialName = await fetchInitialDisplayName(user);
-          const initialPhoto = await fetchProfilePhoto(user);
-          setUser(user);
-          setDisplayName(initialName);
-          setPhotoURL(initialPhoto);
-          await AsyncStorage.setItem('user', JSON.stringify(user));
-        } catch (error) {
-          Toast.show({
-            type: 'error',
-            text1: error.message,
-          });
-        }
-      } else {
-        setUser(null);
-        setDisplayName('');
-        setPhotoURL(null);
-        await AsyncStorage.removeItem('user');
-      }
-    });
-
-    return () => unsubscribe();
-  }, [photoURL, displayName]);
-
-  // Check for stored user on app launch
-  useEffect(() => {
-    const checkUser = async () => {
-      const storedUser = await AsyncStorage.getItem('user');
-      if (storedUser) {
-        const user = JSON.parse(storedUser);
-        setUser(user);
-        const initialName = await fetchInitialDisplayName(user);
-        const initialPhoto = await fetchProfilePhoto(user);
-        setDisplayName(initialName);
-        setPhotoURL(initialPhoto);
-      }
-    };
-    checkUser();
+    const unsubscribe = auth().onAuthStateChanged(onAuthStateChanged);
+    return unsubscribe; // Cleanup subscription on unmount
   }, []);
 
-  // Logout function
+  // Load user data from AsyncStorage on app launch
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const storedUser = await AsyncStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+          console.log('Loaded user from AsyncStorage:', parsedUser);
+        }
+      } catch (error) {
+        console.error('Failed to load user:', error);
+      }
+    };
+
+    loadUser();
+  }, []);
+
+  const login = async (email, password) => {
+    try {
+      const userCredential = await auth().signInWithEmailAndPassword(
+        email,
+        password,
+      );
+      const user = userCredential.user;
+      const initialName = await fetchInitialDisplayName(user);
+      const initialPhoto = await fetchProfilePhoto(user);
+      setUser(user);
+      setDisplayName(initialName);
+      setPhotoURL(initialPhoto);
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+      console.log('User logged in and stored:', user);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: error.message,
+      });
+      throw error;
+    }
+  };
+
   const logout = async () => {
     try {
-      const currentUser = auth().currentUser;
-      if (currentUser) {
-        await auth().signOut();
-      }
+      await auth().signOut();
       setUser(null);
+      setDisplayName('');
+      setPhotoURL(null);
       await AsyncStorage.removeItem('user');
+      console.log('User logged out and removed from AsyncStorage');
     } catch (error) {
       console.error('Error during logout:', error);
       throw error;
@@ -124,6 +156,7 @@ export const AuthProvider = ({children}) => {
       value={{
         user,
         logout,
+        initializing,
         photoURL,
         displayName,
         deletePhoto,
