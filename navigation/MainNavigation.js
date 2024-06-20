@@ -9,6 +9,7 @@ import SignUp from '../Screens/SignUp/SignUp';
 import ForgotPassword from '../Screens/ForgotPassword/ForgotPassword';
 import Profile from '../Screens/Profile/Profile';
 import UpdatePost from '../Screens/UpdatePost/UpdatePost';
+import {ActivityIndicator, View} from 'react-native';
 
 const Stack = createStackNavigator();
 
@@ -20,13 +21,21 @@ const MainNavigation = () => {
     setInitialRoute(user ? Routes.Home : Routes.Login);
   }, [user]);
 
+  if (!initialRoute) {
+    // Render a loading indicator while determining initial route
+    return (
+      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <Stack.Navigator
-      //If already authenticated Home page as initial route else Login screen. No header
       initialRouteName={initialRoute}
       screenOptions={{header: () => null, headerShown: false}}>
       <Stack.Screen name={Routes.Login} component={Login} />
-      <Stack.Screen name={Routes.SignUP} component={SignUp} />
+      <Stack.Screen name={Routes.SignUp} component={SignUp} />
       <Stack.Screen name={Routes.ForgotPassword} component={ForgotPassword} />
       <Stack.Screen name={Routes.Home} component={Home} />
       <Stack.Screen name={Routes.Post} component={Post} />

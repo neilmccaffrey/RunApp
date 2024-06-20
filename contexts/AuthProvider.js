@@ -8,6 +8,7 @@ import {
   removeProfilePhotoUrlFromUserDoc,
 } from '../api/firestore';
 import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Create AuthContext
 export const AuthContext = createContext();
@@ -28,6 +29,7 @@ export const AuthProvider = ({children}) => {
           setUser(user);
           setDisplayName(initialName);
           setPhotoURL(initialPhoto);
+          await AsyncStorage.setItem('user', JSON.stringify(user));
         } catch (error) {
           Toast.show({
             type: 'error',
@@ -38,11 +40,28 @@ export const AuthProvider = ({children}) => {
         setUser(null);
         setDisplayName('');
         setPhotoURL(null);
+        await AsyncStorage.removeItem('user');
       }
     });
 
     return () => unsubscribe();
   }, [photoURL, displayName]);
+
+  // Check for stored user on app launch
+  useEffect(() => {
+    const checkUser = async () => {
+      const storedUser = await AsyncStorage.getItem('user');
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        setUser(user);
+        const initialName = await fetchInitialDisplayName(user);
+        const initialPhoto = await fetchProfilePhoto(user);
+        setDisplayName(initialName);
+        setPhotoURL(initialPhoto);
+      }
+    };
+    checkUser();
+  }, []);
 
   // Logout function
   const logout = async () => {
@@ -52,6 +71,7 @@ export const AuthProvider = ({children}) => {
         await auth().signOut();
       }
       setUser(null);
+      await AsyncStorage.removeItem('user');
     } catch (error) {
       console.error('Error during logout:', error);
       throw error;

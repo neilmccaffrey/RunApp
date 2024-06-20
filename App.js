@@ -19,12 +19,6 @@ const App = () => {
       // Display your custom notification UI here
     });
 
-    // Handle background messages
-    messaging().setBackgroundMessageHandler(async remoteMessage => {
-      console.log('Message handled in the background!', remoteMessage);
-      // Display your custom notification UI here
-    });
-
     return unsubscribe;
   }, []);
 

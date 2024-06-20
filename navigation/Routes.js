@@ -1,7 +1,7 @@
 export const Routes = {
   Home: 'Home',
   Post: 'Post',
-  SignUP: 'SignUp',
+  SignUp: 'SignUp',
   Login: 'Login',
   ForgotPassword: 'ForgotPassword',
   Profile: 'Profile',

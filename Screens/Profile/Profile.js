@@ -8,6 +8,7 @@ import {
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import React, {useState} from 'react';
 import {
+  Alert,
   Image,
   Modal,
   Pressable,
@@ -62,25 +63,45 @@ const Profile = ({navigation}) => {
 
   //take photo
   const takePhoto = () => {
-    launchCamera({}, async response => {
-      if (response.errorCode) {
-        Toast.show({
-          type: 'error',
-          text1: response.errorCode,
-        });
-      } else if (response.assets && response.assets.length > 0) {
-        const takenPhoto = response.assets[0];
-        try {
-          //update photo using context
-          await updateUserProfile(newDisplayName, takenPhoto.uri);
-        } catch (error) {
+    launchCamera(
+      {
+        mediaType: 'photo',
+        saveToPhotos: true,
+        includeBase64: false,
+      },
+      async response => {
+        if (response.didCancel) {
+          Toast.show({
+            type: 'info',
+            text1: 'User cancelled camera',
+          });
+        } else if (response.errorCode) {
           Toast.show({
             type: 'error',
-            text1: error.message,
+            text1: `Camera error: ${response.errorCode}`,
           });
+          Alert.alert('Error', `Camera error: ${response.errorCode}`);
+        } else if (response.errorMessage) {
+          Toast.show({
+            type: 'error',
+            text1: `Error message: ${response.errorMessage}`,
+          });
+          Alert.alert('Error', `Error message: ${response.errorMessage}`);
+        } else if (response.assets && response.assets.length > 0) {
+          const takenPhoto = response.assets[0];
+          try {
+            // Update photo using context
+            await updateUserProfile(newDisplayName, takenPhoto.uri);
+          } catch (error) {
+            Toast.show({
+              type: 'error',
+              text1: error.message,
+            });
+            Alert.alert('Error', error.message);
+          }
         }
-      }
-    });
+      },
+    );
   };
 
   const handleUpdate = async () => {
