@@ -1,5 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const moment = require('moment-timezone');
+
 admin.initializeApp();
 
 exports.sendScheduledNotifications = functions.pubsub
@@ -12,16 +14,16 @@ exports.sendScheduledNotifications = functions.pubsub
       .where('notified', '==', false)
       .get();
 
-    const dateFormat = (await import('dateformat')).default;
-
     snapshot.forEach(async doc => {
       const signup = doc.data();
-      // Ensure eventTime is a valid Firestore Timestamp
+      // Ensure eventTime is a valid JavaScript Timestamp
       const eventTime = signup.eventTime.toDate();
+      //convert to local time zone
+      const localEventTime = moment(eventTime)
+        .tz('America/New_York')
+        .format('h:mm A');
 
-      const notificationMessage = `Tomorrow ${
-        signup.eventLocation
-      } @${dateFormat(eventTime, 'h:MMTT Z')}!`;
+      const notificationMessage = `Tomorrow ${signup.eventLocation} @${localEventTime}!`;
       await sendNotification(signup.deviceToken, notificationMessage);
       await doc.ref.update({notified: true}); // Mark as notified
     });
