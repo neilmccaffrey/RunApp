@@ -12,11 +12,14 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {
   Image,
+  Keyboard,
+  KeyboardAvoidingView,
   Pressable,
   SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import Button from '../../components/Button/Button';
@@ -27,6 +30,10 @@ import {
   updateNotificationTimes,
   updatePostInFirestore,
 } from '../../api/firestore';
+import {
+  GestureHandlerRootView,
+  PanGestureHandler,
+} from 'react-native-gesture-handler';
 
 const UpdatePost = () => {
   const navigation = useNavigation();
@@ -185,172 +192,223 @@ const UpdatePost = () => {
     navigation.goBack();
   };
 
-  return (
-    <SafeAreaView style={[globalStyle.backgroundWhite, globalStyle.flex]}>
-      <Pressable style={styles.backButton} onPress={handleCancel}>
-        <FontAwesomeIcon icon={faChevronLeft} size={20} color={'#B57EDC'} />
-      </Pressable>
-      <View style={styles.createPostTextView}>
-        <Text style={styles.createPostText}>Update Event</Text>
-      </View>
-      <View style={styles.container}>
-        {/* Container for inputs and post button */}
-        <View style={styles.boxContainer}>
-          {/* Picker for date */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Date:</Text>
-            <DateTimePicker
-              testID="dateTimePicker"
-              value={date}
-              mode="date"
-              display="default"
-              accentColor="#B57EDC"
-              textColor="#B57EDC"
-              onChange={onChangeDate}
-            />
-          </View>
-          {/* Picker for time  */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Time:</Text>
-            <DateTimePicker
-              testID="dateTimePicker"
-              value={time}
-              mode="time"
-              display="default"
-              accentColor="#B57EDC"
-              textColor="#B57EDC"
-              onChange={onChangeTime}
-            />
-          </View>
-          {/* Title input */}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Title:</Text>
-            <TextInput
-              placeholder="Type of event/group name"
-              value={title}
-              onChangeText={setTitle}
-              style={styles.input}
-            />
-          </View>
-          {/* location input */}
-          <View style={styles.inputContainer}>
-            <View style={styles.label}>
-              <Text style={styles.locationText}>Location:</Text>
-              {noLocation && <Text style={styles.requiredText}>Required*</Text>}
-            </View>
-            <TextInput
-              placeholder="Where to meet"
-              value={location}
-              onChangeText={text => {
-                setLocation(text);
-                if (text.trim() !== '') {
-                  setNoLocation(false);
-                }
-              }}
-              style={styles.input}
-            />
-          </View>
-          {/* Multiline input for details */}
-          <View style={styles.detailsInputContainer}>
-            <Text style={styles.detailsLabel}>Details:</Text>
-            <TextInput
-              multiline
-              placeholder="Enter any additional details"
-              value={details}
-              onChangeText={setDetails}
-              style={styles.detailsInput}
-            />
-          </View>
-          {/* Photos. If no photo show template, if photo is uploaded show preview */}
-          <View style={styles.photoRow}>
-            {!photo1 && (
-              <TouchableOpacity
-                style={styles.addPhoto}
-                onPress={() => selectPhoto('1')}>
-                <Text style={styles.plus}>+</Text>
-                <FontAwesomeIcon icon={faCamera} size={30} color={'#B57EDC'} />
-              </TouchableOpacity>
-            )}
-            {photo1 && (
-              <View>
-                <Image source={{uri: photo1.url}} style={styles.photo} />
-                <TouchableOpacity
-                  style={styles.trashCan}
-                  onPress={() => {
-                    const combinedEventTime = combineDateAndTime(date, time);
-                    handleDeletePhoto('1', combinedEventTime);
-                  }}>
-                  <FontAwesomeIcon
-                    icon={faTrashCan}
-                    color={'white'}
-                    size={20}
-                  />
-                </TouchableOpacity>
-              </View>
-            )}
-            {!photo2 && (
-              <TouchableOpacity
-                style={styles.addPhoto}
-                onPress={() => selectPhoto('2')}>
-                <Text style={styles.plus}>+</Text>
-                <FontAwesomeIcon icon={faCamera} size={30} color={'#B57EDC'} />
-              </TouchableOpacity>
-            )}
-            {photo2 && (
-              <View>
-                <Image source={{uri: photo2.url}} style={styles.photo} />
-                <TouchableOpacity
-                  style={styles.trashCan}
-                  onPress={() => {
-                    const combinedEventTime = combineDateAndTime(date, time);
-                    handleDeletePhoto('2', combinedEventTime);
-                  }}>
-                  <FontAwesomeIcon
-                    icon={faTrashCan}
-                    color={'white'}
-                    size={20}
-                  />
-                </TouchableOpacity>
-              </View>
-            )}
-            {!photo3 && (
-              <TouchableOpacity
-                style={styles.addPhoto}
-                onPress={() => selectPhoto('3')}>
-                <Text style={styles.plus}>+</Text>
-                <FontAwesomeIcon icon={faCamera} size={30} color={'#B57EDC'} />
-              </TouchableOpacity>
-            )}
-            {photo3 && (
-              <View>
-                <Image source={{uri: photo3.url}} style={styles.photo} />
-                <TouchableOpacity
-                  style={styles.trashCan}
-                  onPress={() => {
-                    const combinedEventTime = combineDateAndTime(date, time);
-                    handleDeletePhoto('3', combinedEventTime);
-                  }}>
-                  <FontAwesomeIcon
-                    icon={faTrashCan}
-                    color={'white'}
-                    size={20}
-                  />
-                </TouchableOpacity>
-              </View>
-            )}
-          </View>
+  const onSwipeGesture = ({nativeEvent}) => {
+    if (nativeEvent.translationY > 20) {
+      Keyboard.dismiss();
+    }
+  };
 
-          <Button
-            title={'Update'}
-            onPress={() => {
-              const combinedEventTime = combineDateAndTime(date, time);
-              handleUpdate(combinedEventTime);
-            }}
-            isDisabled={isUploading}
-          />
-        </View>
-      </View>
-    </SafeAreaView>
+  return (
+    <GestureHandlerRootView style={globalStyle.flex}>
+      <PanGestureHandler onGestureEvent={onSwipeGesture}>
+        <KeyboardAvoidingView behavior={'padding'} style={globalStyle.flex}>
+          <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+            <SafeAreaView
+              style={[globalStyle.backgroundWhite, globalStyle.flex]}>
+              <Pressable style={styles.backButton} onPress={handleCancel}>
+                <FontAwesomeIcon
+                  icon={faChevronLeft}
+                  size={20}
+                  color={'#B57EDC'}
+                />
+              </Pressable>
+              <View style={styles.createPostTextView}>
+                <Text style={styles.createPostText}>Update Event</Text>
+              </View>
+              <View style={styles.container}>
+                {/* Container for inputs and post button */}
+                <View style={styles.boxContainer}>
+                  {/* Picker for date */}
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Date:</Text>
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={date}
+                      mode="date"
+                      display="default"
+                      accentColor="#B57EDC"
+                      textColor="#B57EDC"
+                      onChange={onChangeDate}
+                    />
+                  </View>
+                  {/* Picker for time  */}
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Time:</Text>
+                    <DateTimePicker
+                      testID="dateTimePicker"
+                      value={time}
+                      mode="time"
+                      display="default"
+                      accentColor="#B57EDC"
+                      textColor="#B57EDC"
+                      onChange={onChangeTime}
+                    />
+                  </View>
+                  {/* Title input */}
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Title:</Text>
+                    <TextInput
+                      placeholder="Type of event/group name"
+                      value={title}
+                      onChangeText={setTitle}
+                      style={styles.input}
+                    />
+                  </View>
+                  {/* location input */}
+                  <View style={styles.inputContainer}>
+                    <View style={styles.label}>
+                      <Text style={styles.locationText}>Location:</Text>
+                      {noLocation && (
+                        <Text style={styles.requiredText}>Required*</Text>
+                      )}
+                    </View>
+                    <TextInput
+                      placeholder="Where to meet"
+                      value={location}
+                      onChangeText={text => {
+                        setLocation(text);
+                        if (text.trim() !== '') {
+                          setNoLocation(false);
+                        }
+                      }}
+                      style={styles.input}
+                    />
+                  </View>
+                  {/* Multiline input for details */}
+                  <View style={styles.detailsInputContainer}>
+                    <Text style={styles.detailsLabel}>Details:</Text>
+                    <TextInput
+                      multiline
+                      placeholder="Enter any additional details"
+                      value={details}
+                      onChangeText={setDetails}
+                      style={styles.detailsInput}
+                    />
+                  </View>
+                  {/* Photos. If no photo show template, if photo is uploaded show preview */}
+                  <View style={styles.photoRow}>
+                    {!photo1 && (
+                      <TouchableOpacity
+                        style={styles.addPhoto}
+                        onPress={() => selectPhoto('1')}>
+                        <Text style={styles.plus}>+</Text>
+                        <FontAwesomeIcon
+                          icon={faCamera}
+                          size={30}
+                          color={'#B57EDC'}
+                        />
+                      </TouchableOpacity>
+                    )}
+                    {photo1 && (
+                      <View>
+                        <Image
+                          source={{uri: photo1.url}}
+                          style={styles.photo}
+                        />
+                        <TouchableOpacity
+                          style={styles.trashCan}
+                          onPress={() => {
+                            const combinedEventTime = combineDateAndTime(
+                              date,
+                              time,
+                            );
+                            handleDeletePhoto('1', combinedEventTime);
+                          }}>
+                          <FontAwesomeIcon
+                            icon={faTrashCan}
+                            color={'white'}
+                            size={20}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                    {!photo2 && (
+                      <TouchableOpacity
+                        style={styles.addPhoto}
+                        onPress={() => selectPhoto('2')}>
+                        <Text style={styles.plus}>+</Text>
+                        <FontAwesomeIcon
+                          icon={faCamera}
+                          size={30}
+                          color={'#B57EDC'}
+                        />
+                      </TouchableOpacity>
+                    )}
+                    {photo2 && (
+                      <View>
+                        <Image
+                          source={{uri: photo2.url}}
+                          style={styles.photo}
+                        />
+                        <TouchableOpacity
+                          style={styles.trashCan}
+                          onPress={() => {
+                            const combinedEventTime = combineDateAndTime(
+                              date,
+                              time,
+                            );
+                            handleDeletePhoto('2', combinedEventTime);
+                          }}>
+                          <FontAwesomeIcon
+                            icon={faTrashCan}
+                            color={'white'}
+                            size={20}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                    {!photo3 && (
+                      <TouchableOpacity
+                        style={styles.addPhoto}
+                        onPress={() => selectPhoto('3')}>
+                        <Text style={styles.plus}>+</Text>
+                        <FontAwesomeIcon
+                          icon={faCamera}
+                          size={30}
+                          color={'#B57EDC'}
+                        />
+                      </TouchableOpacity>
+                    )}
+                    {photo3 && (
+                      <View>
+                        <Image
+                          source={{uri: photo3.url}}
+                          style={styles.photo}
+                        />
+                        <TouchableOpacity
+                          style={styles.trashCan}
+                          onPress={() => {
+                            const combinedEventTime = combineDateAndTime(
+                              date,
+                              time,
+                            );
+                            handleDeletePhoto('3', combinedEventTime);
+                          }}>
+                          <FontAwesomeIcon
+                            icon={faTrashCan}
+                            color={'white'}
+                            size={20}
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </View>
+
+                  <Button
+                    title={'Update'}
+                    onPress={() => {
+                      const combinedEventTime = combineDateAndTime(date, time);
+                      handleUpdate(combinedEventTime);
+                    }}
+                    isDisabled={isUploading}
+                  />
+                </View>
+              </View>
+            </SafeAreaView>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </PanGestureHandler>
+    </GestureHandlerRootView>
   );
 };
 

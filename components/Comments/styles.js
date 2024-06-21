@@ -26,10 +26,13 @@ const styles = StyleSheet.create({
     elevation: 5,
     height: '60%',
   },
-  xButton: {
+  xButtonContainer: {
+    padding: 10,
     position: 'absolute',
     top: verticalScale(8),
     right: horizontalScale(10),
+  },
+  xButton: {
     color: '#36454F',
   },
   flatListContainer: {

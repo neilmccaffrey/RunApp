@@ -13,6 +13,8 @@ import {
   TouchableOpacity,
   View,
   Image,
+  KeyboardAvoidingView,
+  Keyboard,
 } from 'react-native';
 import styles from './styles';
 import {SwipeListView} from 'react-native-swipe-list-view';
@@ -26,6 +28,11 @@ import {
 } from '../../api/firestore';
 import {useAuth} from '../../contexts/AuthProvider';
 import uuid from 'react-native-uuid';
+import globalStyle from '../../Styles/globalStyle';
+import {
+  GestureHandlerRootView,
+  PanGestureHandler,
+} from 'react-native-gesture-handler';
 
 const Comments = ({isOpen, onClose, postItem}) => {
   const {user, displayName, photoURL} = useAuth();
@@ -105,68 +112,100 @@ const Comments = ({isOpen, onClose, postItem}) => {
     </View>
   );
 
+  const onSwipeGesture = ({nativeEvent}) => {
+    if (nativeEvent.translationY > 20) {
+      Keyboard.dismiss();
+    }
+  };
+
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={isOpen}
-      onRequestClose={onClose}>
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.overlay} />
-      </TouchableWithoutFeedback>
-      <View style={styles.modalView}>
-        <TouchableOpacity onPress={onClose}>
-          <FontAwesomeIcon icon={faXmark} size={30} style={styles.xButton} />
-        </TouchableOpacity>
-        <View style={styles.flatListContainer}>
-          <SwipeListView
-            showsVerticalScrollIndicator={true}
-            ListEmptyComponent={
-              <View style={styles.emptyList}>
-                <Text style={styles.emptyListText}>No comments yet</Text>
-              </View>
-            }
-            data={comments}
-            keyExtractor={item => item.commentId.toString()}
-            renderHiddenItem={renderHiddenItem}
-            rightOpenValue={-150}
-            renderItem={({item}) => {
-              return (
-                <View style={styles.commentContainer}>
-                  <Image
-                    source={{uri: item.photoURL}}
-                    style={styles.commentImage}
-                  />
-                  <View>
-                    <Text style={styles.displayNameText}>
-                      {item.displayName}
-                    </Text>
-                    <Text style={styles.commentText}>{item.text}</Text>
+    <GestureHandlerRootView style={globalStyle.flex}>
+      <PanGestureHandler onGestureEvent={onSwipeGesture}>
+        <KeyboardAvoidingView behavior={'padding'} style={globalStyle.flex}>
+          <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+            <View style={globalStyle.flex}>
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isOpen}
+                onRequestClose={onClose}>
+                <KeyboardAvoidingView
+                  behavior={'padding'}
+                  style={globalStyle.flex}>
+                  <TouchableWithoutFeedback onPress={onClose}>
+                    <View style={styles.overlay} />
+                  </TouchableWithoutFeedback>
+                  <View style={styles.modalView}>
+                    <TouchableOpacity
+                      onPress={onClose}
+                      style={styles.xButtonContainer}>
+                      <FontAwesomeIcon
+                        icon={faXmark}
+                        size={30}
+                        style={styles.xButton}
+                      />
+                    </TouchableOpacity>
+                    <View style={styles.flatListContainer}>
+                      <SwipeListView
+                        showsVerticalScrollIndicator={true}
+                        ListEmptyComponent={
+                          <View style={styles.emptyList}>
+                            <Text style={styles.emptyListText}>
+                              No comments yet
+                            </Text>
+                          </View>
+                        }
+                        data={comments}
+                        keyExtractor={item => item.commentId.toString()}
+                        renderHiddenItem={renderHiddenItem}
+                        rightOpenValue={-150}
+                        renderItem={({item}) => {
+                          return (
+                            <View style={styles.commentContainer}>
+                              <Image
+                                source={{uri: item.photoURL}}
+                                style={styles.commentImage}
+                              />
+                              <View>
+                                <Text style={styles.displayNameText}>
+                                  {item.displayName}
+                                </Text>
+                                <Text style={styles.commentText}>
+                                  {item.text}
+                                </Text>
+                              </View>
+                            </View>
+                          );
+                        }}
+                      />
+                    </View>
+                    <View style={styles.inputContainer}>
+                      <TextInput
+                        multiline
+                        placeholder="Add a comment..."
+                        value={newComment}
+                        onChangeText={setNewComment}
+                        textAlignVertical="top"
+                        style={styles.input}
+                      />
+                      <TouchableOpacity
+                        style={styles.arrow}
+                        onPress={handleAddComment}>
+                        <FontAwesomeIcon
+                          icon={faCircleArrowUp}
+                          size={scaleFontSize(35)}
+                          color={'#B57EDC'}
+                        />
+                      </TouchableOpacity>
+                    </View>
                   </View>
-                </View>
-              );
-            }}
-          />
-        </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            multiline
-            placeholder="Add a comment..."
-            value={newComment}
-            onChangeText={setNewComment}
-            textAlignVertical="top"
-            style={styles.input}
-          />
-          <TouchableOpacity style={styles.arrow} onPress={handleAddComment}>
-            <FontAwesomeIcon
-              icon={faCircleArrowUp}
-              size={scaleFontSize(35)}
-              color={'#B57EDC'}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
+                </KeyboardAvoidingView>
+              </Modal>
+            </View>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </PanGestureHandler>
+    </GestureHandlerRootView>
   );
 };
 

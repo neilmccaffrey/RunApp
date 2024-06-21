@@ -10,6 +10,8 @@ import React, {useState} from 'react';
 import {
   Alert,
   Image,
+  Keyboard,
+  KeyboardAvoidingView,
   Modal,
   Pressable,
   SafeAreaView,
@@ -26,6 +28,10 @@ import Toast from 'react-native-toast-message';
 import {useAuth} from '../../contexts/AuthProvider';
 import Button from '../../components/Button/Button';
 import {Routes} from '../../navigation/Routes';
+import {
+  GestureHandlerRootView,
+  PanGestureHandler,
+} from 'react-native-gesture-handler';
 
 const Profile = ({navigation}) => {
   const {logout, updateUserProfile, displayName, photoURL, deletePhoto} =
@@ -121,113 +127,153 @@ const Profile = ({navigation}) => {
     navigation.navigate(Routes.Home);
   };
 
+  const onSwipeGesture = ({nativeEvent}) => {
+    if (nativeEvent.translationY > 20) {
+      Keyboard.dismiss();
+    }
+  };
+
   return (
-    <SafeAreaView style={[globalStyle.backgroundWhite, globalStyle.flex]}>
-      <View style={styles.backButtonLogoutContainer}>
-        <Pressable onPress={() => navigation.goBack()}>
-          <FontAwesomeIcon icon={faChevronLeft} size={20} color={'#B57EDC'} />
-        </Pressable>
-        <TouchableOpacity
-          onPress={() => {
-            logout();
-            navigation.navigate(Routes.Login);
-          }}>
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.profileTextView}>
-        <Text style={styles.profileText}>Profile</Text>
-      </View>
-      <View style={styles.container}>
-        {/* Container for inputs and update button */}
-        <View style={styles.boxContainer}>
-          {!photoURL && (
-            <View style={styles.addPhotoView}>
-              <TouchableOpacity
-                style={styles.addPhoto}
-                onPress={() => setModalVisible(true)}>
-                <Text style={styles.plus}>+</Text>
-                <FontAwesomeIcon icon={faCamera} size={50} color={'#B57EDC'} />
-              </TouchableOpacity>
-            </View>
-          )}
-          {photoURL && (
-            <View style={styles.alignPhotoEditTextCenter}>
-              <TouchableOpacity onPress={() => setModalVisible(true)}>
-                <Image source={{uri: photoURL}} style={styles.photo} />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.editPhotoMargin}
-                onPress={() => setModalVisible(true)}>
-                <Text style={styles.editPhotoText}>Edit/delete photo</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Display name: </Text>
-            <TextInput
-              placeholder="Name everyone will see"
-              value={newDisplayName}
-              onChangeText={setNewDisplayName}
-              style={styles.input}
-            />
-          </View>
-          <Button
-            title={'Update'}
-            onPress={handleUpdate}
-            isDisabled={isUploading}
-          />
-        </View>
-      </View>
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => {
-          setModalVisible(false);
-        }}>
-        <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
-          <View style={styles.overlay}>
-            <View style={styles.modalView}>
-              <FontAwesomeIcon
-                icon={faXmark}
-                size={30}
-                style={styles.xButton}
-              />
-              <TouchableOpacity
-                style={styles.modalOptions}
-                onPress={() => {
-                  selectPhoto();
-                }}>
-                <FontAwesomeIcon icon={faImage} size={30} color={'#B57EDC'} />
-                <Text style={styles.modalOptionsText}>Choose from library</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.modalOptions}
-                onPress={() => {
-                  takePhoto();
-                }}>
-                <FontAwesomeIcon icon={faCamera} size={30} color={'#B57EDC'} />
-                <Text style={styles.modalOptionsText}>Take photo</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.modalOptions}
-                onPress={() => {
-                  deletePhoto();
+    <GestureHandlerRootView style={globalStyle.flex}>
+      <PanGestureHandler onGestureEvent={onSwipeGesture}>
+        <KeyboardAvoidingView behavior={'padding'} style={globalStyle.flex}>
+          <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+            <SafeAreaView
+              style={[globalStyle.backgroundWhite, globalStyle.flex]}>
+              <View style={styles.backButtonLogoutContainer}>
+                <Pressable onPress={() => navigation.goBack()}>
+                  <FontAwesomeIcon
+                    icon={faChevronLeft}
+                    size={20}
+                    color={'#B57EDC'}
+                  />
+                </Pressable>
+                <TouchableOpacity
+                  onPress={() => {
+                    logout();
+                    navigation.navigate(Routes.Login);
+                  }}>
+                  <Text style={styles.logoutText}>Logout</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.profileTextView}>
+                <Text style={styles.profileText}>Profile</Text>
+              </View>
+              <View style={styles.container}>
+                {/* Container for inputs and update button */}
+                <View style={styles.boxContainer}>
+                  {!photoURL && (
+                    <View style={styles.addPhotoView}>
+                      <TouchableOpacity
+                        style={styles.addPhoto}
+                        onPress={() => setModalVisible(true)}>
+                        <Text style={styles.plus}>+</Text>
+                        <FontAwesomeIcon
+                          icon={faCamera}
+                          size={50}
+                          color={'#B57EDC'}
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                  {photoURL && (
+                    <View style={styles.alignPhotoEditTextCenter}>
+                      <TouchableOpacity onPress={() => setModalVisible(true)}>
+                        <Image source={{uri: photoURL}} style={styles.photo} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.editPhotoMargin}
+                        onPress={() => setModalVisible(true)}>
+                        <Text style={styles.editPhotoText}>
+                          Edit/delete photo
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                  <View style={styles.inputContainer}>
+                    <Text style={styles.label}>Display name: </Text>
+                    <TextInput
+                      placeholder="Name everyone will see"
+                      value={newDisplayName}
+                      onChangeText={setNewDisplayName}
+                      style={styles.input}
+                    />
+                  </View>
+                  <Button
+                    title={'Update'}
+                    onPress={handleUpdate}
+                    isDisabled={isUploading}
+                  />
+                </View>
+              </View>
+              <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => {
                   setModalVisible(false);
                 }}>
-                <FontAwesomeIcon icon={faTrashCan} size={30} color={'red'} />
-                <Text style={styles.modalOptionsText}>
-                  Delete current photo
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-    </SafeAreaView>
+                <TouchableWithoutFeedback
+                  onPress={() => setModalVisible(false)}>
+                  <View style={styles.overlay}>
+                    <View style={styles.modalView}>
+                      <FontAwesomeIcon
+                        icon={faXmark}
+                        size={30}
+                        style={styles.xButton}
+                      />
+                      <TouchableOpacity
+                        style={styles.modalOptions}
+                        onPress={() => {
+                          selectPhoto();
+                        }}>
+                        <FontAwesomeIcon
+                          icon={faImage}
+                          size={30}
+                          color={'#B57EDC'}
+                        />
+                        <Text style={styles.modalOptionsText}>
+                          Choose from library
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={styles.modalOptions}
+                        onPress={() => {
+                          takePhoto();
+                        }}>
+                        <FontAwesomeIcon
+                          icon={faCamera}
+                          size={30}
+                          color={'#B57EDC'}
+                        />
+                        <Text style={styles.modalOptionsText}>Take photo</Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={styles.modalOptions}
+                        onPress={() => {
+                          deletePhoto();
+                          setModalVisible(false);
+                        }}>
+                        <FontAwesomeIcon
+                          icon={faTrashCan}
+                          size={30}
+                          color={'red'}
+                        />
+                        <Text style={styles.modalOptionsText}>
+                          Delete current photo
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+              </Modal>
+            </SafeAreaView>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </PanGestureHandler>
+    </GestureHandlerRootView>
   );
 };
 

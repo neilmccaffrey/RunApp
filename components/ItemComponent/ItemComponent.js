@@ -312,7 +312,9 @@ const ItemComponent = memo(
             <View style={styles.overlay} />
           </TouchableWithoutFeedback>
           <View style={styles.modalView}>
-            <TouchableOpacity onPress={() => setGoingModal(false)}>
+            <TouchableOpacity
+              onPress={() => setGoingModal(false)}
+              style={styles.xButtonContainer}>
               <FontAwesomeIcon
                 icon={faXmark}
                 size={30}
