@@ -14,19 +14,24 @@ exports.sendScheduledNotifications = functions.pubsub
       .where('notified', '==', false)
       .get();
 
-    snapshot.forEach(async doc => {
+    const batch = admin.firestore().batch();
+
+    const notificationsPromises = snapshot.docs.map(async doc => {
       const signup = doc.data();
       // Ensure eventTime is a valid JavaScript Timestamp
       const eventTime = signup.eventTime.toDate();
-      //convert to local time zone
+      // Convert to local time zone
       const localEventTime = moment(eventTime)
         .tz('America/New_York')
         .format('h:mm A');
 
       const notificationMessage = `Tomorrow ${signup.eventLocation} @${localEventTime}!`;
       await sendNotification(signup.deviceToken, notificationMessage);
-      await doc.ref.update({notified: true}); // Mark as notified
+      batch.update(doc.ref, {notified: true}); // Mark as notified
     });
+
+    await Promise.all(notificationsPromises);
+    await batch.commit();
 
     return null;
   });

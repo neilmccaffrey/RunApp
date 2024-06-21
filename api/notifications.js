@@ -16,25 +16,3 @@ export async function getDeviceToken() {
   console.log('FCM Token:', token);
   return token;
 }
-
-// Get FCM token
-messaging()
-  .getToken()
-  .then(token => {
-    console.log(token);
-  });
-
-// Listen to token refresh
-messaging().onTokenRefresh(token => {
-  console.log(token);
-});
-
-// Handle foreground messages
-messaging().onMessage(async remoteMessage => {
-  console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
-});
-
-// Handle background messages
-messaging().setBackgroundMessageHandler(async remoteMessage => {
-  console.log('Message handled in the background!', remoteMessage);
-});

@@ -5,21 +5,12 @@ import Toast from 'react-native-toast-message';
 import {AuthProvider} from './contexts/AuthProvider';
 import {ProfilePhotoProvider} from './contexts/ProfilePhotoContext';
 import {requestUserPermission} from './api/notifications';
-import messaging from '@react-native-firebase/messaging';
 import BootSplash from 'react-native-bootsplash';
 
 const App = () => {
   useEffect(() => {
-    // Request permissions
+    // Request permission for push notifications
     requestUserPermission();
-
-    // Listen to foreground messages
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
-      // Display your custom notification UI here
-    });
-
-    return unsubscribe;
   }, []);
 
   return (
