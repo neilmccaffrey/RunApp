@@ -1,6 +1,7 @@
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import Toast from 'react-native-toast-message';
+import {getDeviceToken} from './notifications';
 
 export const createPost = async (
   user,
@@ -244,6 +245,7 @@ export const updateAttendanceInFirestore = async (
   eventTime,
 ) => {
   try {
+    const deviceToken = await getDeviceToken();
     const postRef = firestore().collection('posts').doc(postId);
     const postDoc = await postRef.get();
 
@@ -272,6 +274,7 @@ export const updateAttendanceInFirestore = async (
             eventTime: eventTime,
             notificationTime: notificationTime,
             notified: false,
+            deviceToken: deviceToken, // Store the device token
           });
         }
       } else {
