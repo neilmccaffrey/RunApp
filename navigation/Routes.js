@@ -6,4 +6,5 @@ export const Routes = {
   ForgotPassword: 'ForgotPassword',
   Profile: 'Profile',
   UpdatePost: 'UpdatePost',
+  Info: 'Info',
 };

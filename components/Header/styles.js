@@ -8,9 +8,10 @@ import {
 const styles = StyleSheet.create({
   headerContainer: {
     marginTop: verticalScale(8),
+    marginHorizontal: horizontalScale(16),
     backgroundColor: '#fff', // Ensure the background is set
     zIndex: 1, // Ensure the header is above the shadow
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     flexDirection: 'row',
     alignItems: 'center',
   },

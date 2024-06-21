@@ -10,6 +10,7 @@ import ForgotPassword from '../Screens/ForgotPassword/ForgotPassword';
 import Profile from '../Screens/Profile/Profile';
 import UpdatePost from '../Screens/UpdatePost/UpdatePost';
 import {ActivityIndicator, View} from 'react-native';
+import Info from '../Screens/Info/Info';
 
 const Stack = createStackNavigator();
 
@@ -43,6 +44,7 @@ const MainNavigation = () => {
       <Stack.Screen name={Routes.Post} component={Post} />
       <Stack.Screen name={Routes.UpdatePost} component={UpdatePost} />
       <Stack.Screen name={Routes.Profile} component={Profile} />
+      <Stack.Screen name={Routes.Info} component={Info} />
     </Stack.Navigator>
   );
 };
