@@ -28,7 +28,7 @@ const MainNavigation = () => {
     // Render a loading indicator while determining initial route
     return (
       <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#B57EDC" />
       </View>
     );
   }

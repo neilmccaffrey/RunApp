@@ -188,7 +188,7 @@ const Profile = ({navigation}) => {
                           }}
                           resizeMode={FastImage.resizeMode.cover}
                           placeholder={
-                            <ActivityIndicator size="large" color="#0000ff" />
+                            <ActivityIndicator size="large" color="#B57EDC" />
                           }
                         />
                       </TouchableOpacity>

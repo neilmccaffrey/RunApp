@@ -25,7 +25,7 @@ const Header = ({navigation}) => {
                 priority: FastImage.priority.high,
               }}
               resizeMode={FastImage.resizeMode.cover}
-              placeholder={<ActivityIndicator size="large" color="#0000ff" />}
+              placeholder={<ActivityIndicator size="large" color="#B57EDC" />}
             />
           ) : (
             <View style={styles.photo} />

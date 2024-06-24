@@ -12,9 +12,9 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
   View,
-  Image,
   KeyboardAvoidingView,
   Keyboard,
+  ActivityIndicator,
 } from 'react-native';
 import styles from './styles';
 import {SwipeListView} from 'react-native-swipe-list-view';
@@ -33,6 +33,7 @@ import {
   GestureHandlerRootView,
   PanGestureHandler,
 } from 'react-native-gesture-handler';
+import FastImage from 'react-native-fast-image';
 
 const Comments = ({isOpen, onClose, postItem}) => {
   const {user, displayName, photoURL} = useAuth();
@@ -45,6 +46,13 @@ const Comments = ({isOpen, onClose, postItem}) => {
       if (postItem.id) {
         const fetchedComments = await fetchComments(postItem.id);
         setComments(fetchedComments);
+        // Preload comment images if fetched comments exists and is greater than 0
+        if (fetchComments && fetchedComments?.length > 0) {
+          const uris = fetchedComments.map(comment => ({
+            uri: comment.photoURL,
+          }));
+          FastImage.preload(uris);
+        }
       }
     };
 
@@ -74,6 +82,10 @@ const Comments = ({isOpen, onClose, postItem}) => {
       setNewComment('');
       const updatedComments = await fetchComments(postItem.id); // Refresh comments after adding a new comment
       setComments(updatedComments);
+      // Preload the new comment image
+      if (comment.photoURL) {
+        FastImage.preload([{uri: comment.photoURL}]);
+      }
       Toast.show({
         type: 'success',
         text1: 'Comment added successfully',
@@ -86,31 +98,47 @@ const Comments = ({isOpen, onClose, postItem}) => {
     }
   };
 
-  const renderHiddenItem = renData => (
-    <View style={styles.hidden}>
-      <TouchableOpacity
-        style={styles.backRightButton}
-        onPress={async () => {
-          try {
-            await deleteComment(postItem.id, renData.item.commentId);
-            const updatedComments = await fetchComments(postItem.id); // Refresh comments after adding a new comment
-            setComments(updatedComments);
-            Toast.show({
-              type: 'success',
-              text1: 'Comment deleted',
-            });
-          } catch (error) {
-            Toast.show({
-              type: 'error',
-              text1: error.message,
-            });
-          }
-        }}>
-        <FontAwesomeIcon icon={faTrashCan} color={'white'} size={20} />
-        <Text style={styles.textColor}>Delete</Text>
-      </TouchableOpacity>
-    </View>
-  );
+  const renderHiddenItem = renData => {
+    const isCommentOwner = renData.item.userId === user.uid;
+    return (
+      <View style={styles.hidden}>
+        <TouchableOpacity
+          style={[
+            styles.backRightButton,
+            !isCommentOwner && styles.notCommentOwner,
+          ]}
+          onPress={async () => {
+            if (!isCommentOwner) {
+              return;
+            }
+            try {
+              await deleteComment(postItem.id, renData.item.commentId);
+              const updatedComments = await fetchComments(postItem.id); // Refresh comments after adding a new comment
+              setComments(updatedComments);
+
+              // Preload updated comment images
+              const uris = updatedComments.map(comment => ({
+                uri: comment.photoURL,
+              }));
+              FastImage.preload(uris);
+
+              Toast.show({
+                type: 'success',
+                text1: 'Comment deleted',
+              });
+            } catch (error) {
+              Toast.show({
+                type: 'error',
+                text1: error.message,
+              });
+            }
+          }}>
+          <FontAwesomeIcon icon={faTrashCan} color={'white'} size={20} />
+          <Text style={styles.textColor}>Delete</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   const onSwipeGesture = ({nativeEvent}) => {
     if (nativeEvent.translationY > 20) {
@@ -162,9 +190,19 @@ const Comments = ({isOpen, onClose, postItem}) => {
                         renderItem={({item}) => {
                           return (
                             <View style={styles.commentContainer}>
-                              <Image
-                                source={{uri: item.photoURL}}
+                              <FastImage
                                 style={styles.commentImage}
+                                source={{
+                                  uri: item.photoURL,
+                                  priority: FastImage.priority.high,
+                                }}
+                                resizeMode={FastImage.resizeMode.cover}
+                                placeholder={
+                                  <ActivityIndicator
+                                    size="large"
+                                    color="#0000ff"
+                                  />
+                                }
                               />
                               <View>
                                 <Text style={styles.displayNameText}>

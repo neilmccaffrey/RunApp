@@ -203,7 +203,7 @@ export const fetchInitialDisplayName = async user => {
       const userData = userDoc.data();
       return userData.displayName;
     } else {
-      return '';
+      return 'Anonymous';
     }
   } catch (error) {
     throw error;
@@ -213,9 +213,15 @@ export const fetchInitialDisplayName = async user => {
 //add displayName to users doc
 export const addDisplayNameToUserDoc = async (displayName, user) => {
   try {
-    await firestore().collection('users').doc(user.uid).update({
-      displayName: displayName,
-    });
+    if (!displayName || displayName.trim() === '') {
+      await firestore().collection('users').doc(user.uid).update({
+        displayName: 'Anonymous',
+      });
+    } else {
+      await firestore().collection('users').doc(user.uid).update({
+        displayName: displayName,
+      });
+    }
   } catch (error) {
     throw error;
   }

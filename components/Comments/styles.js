@@ -107,6 +107,9 @@ const styles = StyleSheet.create({
     right: 0,
     marginBottom: verticalScale(16),
   },
+  notCommentOwner: {
+    opacity: 0.5,
+  },
   textColor: {
     color: 'white',
   },

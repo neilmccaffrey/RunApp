@@ -1,13 +1,13 @@
-import React, {memo, useEffect, useState} from 'react';
+import React, {memo, useEffect, useMemo, useState} from 'react';
 import {
   View,
   ScrollView,
-  Image,
   Text,
   TouchableOpacity,
   Modal,
   TouchableWithoutFeedback,
   FlatList,
+  ActivityIndicator,
 } from 'react-native';
 import styles from './styles';
 import ShowMore from '../ShowMore/ShowMore';
@@ -32,6 +32,7 @@ import dateFormat from 'dateformat';
 import {faComment, faThumbsUp} from '@fortawesome/free-regular-svg-icons';
 import {faThumbsUp as faThumbsUpSolid} from '@fortawesome/free-solid-svg-icons';
 import Comments from '../Comments/Comments';
+import FastImage from 'react-native-fast-image';
 
 const ItemComponent = memo(
   ({item, itemIndex, handleScroll, renderPagination, onDelete}) => {
@@ -43,6 +44,7 @@ const ItemComponent = memo(
     const [displayName, setDisplayName] = useState('');
     const [usersPost, setUsersPost] = useState(false);
     const [attendanceButton, setAttendanceButton] = useState(false);
+
     // open/close comment modal logic
     const [commentModal, setCommentModal] = useState(false);
     const openCommentModal = () => setCommentModal(true);
@@ -65,6 +67,11 @@ const ItemComponent = memo(
           //check if logged in users UID matches the userId that created the post (to implement edit/delete post)
           if (user && user.uid === item.userId) {
             setUsersPost(true);
+          }
+
+          // Preload the profile photo
+          if (photo) {
+            FastImage.preload([{uri: photo}]);
           }
         } catch (error) {
           Toast.show({
@@ -89,16 +96,19 @@ const ItemComponent = memo(
       checkUserAttendance();
     }, [item.userId, item.id, item.isGoing, user]);
 
-    const images = [];
-    if (item.photo1) {
-      images.push({uri: item.photo1.url});
-    }
-    if (item.photo2) {
-      images.push({uri: item.photo2.url});
-    }
-    if (item.photo3) {
-      images.push({uri: item.photo3.url});
-    }
+    const images = useMemo(() => {
+      const imageArray = [];
+      if (item.photo1) {
+        imageArray.push({uri: item.photo1.url});
+      }
+      if (item.photo2) {
+        imageArray.push({uri: item.photo2.url});
+      }
+      if (item.photo3) {
+        imageArray.push({uri: item.photo3.url});
+      }
+      return imageArray;
+    }, [item.photo1, item.photo2, item.photo3]);
 
     const handleDelete = async () => {
       try {
@@ -169,12 +179,17 @@ const ItemComponent = memo(
       <View style={styles.itemsContainer}>
         <View style={styles.photoTextContainer}>
           <View style={styles.photoTextView}>
-            <Image source={{uri: profilePhoto}} style={styles.photo} />
-            {displayName ? (
-              <Text style={styles.displayNameText}>{displayName}</Text>
-            ) : (
-              <Text style={styles.displayNameText}>Anonymous</Text>
-            )}
+            <FastImage
+              style={styles.photo}
+              source={{
+                uri: profilePhoto,
+                priority: FastImage.priority.high,
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+              placeholder={<ActivityIndicator size="large" color="#B57EDC" />}
+            />
+
+            <Text style={styles.displayNameText}>{displayName}</Text>
           </View>
           {usersPost && (
             <TouchableOpacity onPress={() => setModalVisible(true)}>
@@ -207,10 +222,15 @@ const ItemComponent = memo(
           onScroll={event => handleScroll(event, itemIndex, images.length)}
           scrollEventThrottle={16}>
           {images.map((image, index) => (
-            <Image
+            <FastImage
               key={index}
-              source={{uri: image.uri}}
               style={styles.pictures}
+              source={{
+                uri: image.uri,
+                priority: FastImage.priority.high,
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+              placeholder={<ActivityIndicator size="large" color="#0000ff" />}
             />
           ))}
         </ScrollView>
