@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#EFF2F6',
     padding: horizontalScale(10),
     justifyContent: 'space-between',
+    marginTop: verticalScale(15),
   },
   buttonItems: {
     flexDirection: 'row',
@@ -36,6 +37,19 @@ const styles = StyleSheet.create({
     fontSize: scaleFontSize(18),
     color: '#36454F',
     marginLeft: horizontalScale(15),
+  },
+  messageText: {
+    fontSize: scaleFontSize(18),
+    color: '#36454F',
+    marginHorizontal: horizontalScale(15),
+  },
+  infoText: {
+    fontSize: scaleFontSize(18),
+    color: '#36454F',
+  },
+  infoContainer: {
+    marginHorizontal: horizontalScale(15),
+    marginVertical: verticalScale(25),
   },
 });
 

@@ -44,7 +44,7 @@ const Post = ({navigation}) => {
   const [photo3, setPhoto3] = useState('');
   const [isUploading, setIsUploading] = useState(false);
 
-  const {user} = useAuth();
+  const {user, photoURL} = useAuth();
 
   //change date and time handlers
   const onChangeDate = (event, selectedDate) => {
@@ -149,6 +149,7 @@ const Post = ({navigation}) => {
         photo1,
         photo2,
         photo3,
+        photoURL,
       );
       navigation.navigate(Routes.Home);
     }

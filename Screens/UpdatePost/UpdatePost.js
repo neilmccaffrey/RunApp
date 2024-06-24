@@ -63,7 +63,7 @@ const UpdatePost = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [noLocation, setNoLocation] = useState(false);
 
-  const {user} = useAuth();
+  const {user, photoURL} = useAuth();
 
   //change date and time handlers
   const onChangeDate = (event, selectedDate) => {
@@ -145,6 +145,7 @@ const UpdatePost = () => {
         location,
         details,
         eventTime,
+        photoURL,
         ...updatedPhotos,
       });
     } catch (error) {
@@ -166,6 +167,7 @@ const UpdatePost = () => {
         photo1: photo1,
         photo2: photo2,
         photo3: photo3,
+        photoURL,
         user,
       });
 

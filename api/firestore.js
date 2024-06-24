@@ -12,6 +12,7 @@ export const createPost = async (
   photo1,
   photo2,
   photo3,
+  photoURL,
 ) => {
   if (!user) {
     throw new Error('User not authenticated');
@@ -29,6 +30,7 @@ export const createPost = async (
         photo2: photo2 || null,
         photo3: photo3 || null,
         createdAt: firestore.FieldValue.serverTimestamp(),
+        profilePhoto: photoURL,
         userId: user.uid,
       });
     Toast.show({
@@ -56,6 +58,7 @@ export const updatePostInFirestore = async ({
   photo1,
   photo2,
   photo3,
+  photoURL,
 }) => {
   if (!user) {
     throw new Error('User not authenticated');
@@ -73,6 +76,7 @@ export const updatePostInFirestore = async ({
         photo1: photo1 || null,
         photo2: photo2 || null,
         photo3: photo3 || null,
+        profilePhoto: photoURL,
         createdAt: firestore.FieldValue.serverTimestamp(),
         userId: user.uid,
       });

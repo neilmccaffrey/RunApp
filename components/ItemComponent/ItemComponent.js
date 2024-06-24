@@ -15,7 +15,6 @@ import Toast from 'react-native-toast-message';
 import {
   deletePostFromFirestore,
   fetchDisplayName,
-  fetchProfilePhotoWithId,
   updateAttendanceInFirestore,
 } from '../../api/firestore';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -40,7 +39,6 @@ const ItemComponent = memo(
     const navigation = useNavigation();
     const [goingModal, setGoingModal] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-    const [profilePhoto, setProfilePhoto] = useState(null);
     const [displayName, setDisplayName] = useState('');
     const [usersPost, setUsersPost] = useState(false);
     const [attendanceButton, setAttendanceButton] = useState(false);
@@ -53,25 +51,16 @@ const ItemComponent = memo(
     useEffect(() => {
       //reset state after delete
       const resetState = () => {
-        // setProfilePhoto(null);
-        // setDisplayName('');
         setUsersPost(false);
       };
 
-      const getProfilePhoto = async () => {
+      const getProfileData = async () => {
         try {
-          const photo = await fetchProfilePhotoWithId(item.userId);
           const name = await fetchDisplayName(item.userId);
-          setProfilePhoto(photo);
           setDisplayName(name);
           //check if logged in users UID matches the userId that created the post (to implement edit/delete post)
           if (user && user.uid === item.userId) {
             setUsersPost(true);
-          }
-
-          // Preload the profile photo
-          if (photo) {
-            FastImage.preload([{uri: photo}]);
           }
         } catch (error) {
           Toast.show({
@@ -92,7 +81,7 @@ const ItemComponent = memo(
       };
 
       resetState();
-      getProfilePhoto();
+      getProfileData();
       checkUserAttendance();
     }, [item.userId, item.id, item.isGoing, user]);
 
@@ -182,7 +171,7 @@ const ItemComponent = memo(
             <FastImage
               style={styles.photo}
               source={{
-                uri: profilePhoto,
+                uri: item.profilePhoto, // Use profile photo from the post document
                 priority: FastImage.priority.high,
               }}
               resizeMode={FastImage.resizeMode.cover}

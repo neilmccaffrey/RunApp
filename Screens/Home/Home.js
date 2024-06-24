@@ -45,6 +45,9 @@ const Home = ({navigation}) => {
   const preloadImages = async documents => {
     const imageUris = documents.flatMap(doc => {
       const images = [];
+      if (doc.profilePhoto) {
+        images.push({uri: doc.profilePhoto});
+      }
       if (doc.photo1) {
         images.push({uri: doc.photo1.url});
       }
