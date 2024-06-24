@@ -6,21 +6,23 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
-import {signInWithEmailAndPassword} from '../../api/auth';
 import globalStyle from '../../Styles/globalStyle';
 import styles from './styles';
 import {Routes} from '../../navigation/Routes';
 import Button from '../../components/Button/Button';
 import Toast from 'react-native-toast-message';
 import {getErrorMessage} from '../../components/getErrorMessage';
+import {useAuth} from '../../contexts/AuthProvider';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const {login} = useAuth();
+
   const handleLogin = async () => {
     try {
-      await signInWithEmailAndPassword(email, password);
+      login(email, password);
       // Navigate to Home screen
       navigation.navigate(Routes.Home);
     } catch (error) {
@@ -32,7 +34,7 @@ const Login = ({navigation}) => {
   };
 
   const handleSignUpPress = () => {
-    navigation.navigate(Routes.SignUP);
+    navigation.navigate(Routes.SignUp);
   };
 
   const handleForgotPasswordPress = () => {

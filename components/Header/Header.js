@@ -1,11 +1,12 @@
 import React from 'react';
-import {Alert, Image, Text, TouchableOpacity, View} from 'react-native';
+import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native';
 import styles from './styles';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faCircleInfo, faPenToSquare} from '@fortawesome/free-solid-svg-icons';
 import {Routes} from '../../navigation/Routes';
 import {horizontalScale} from '../../Styles/scaling';
 import {useAuth} from '../../contexts/AuthProvider';
+import FastImage from 'react-native-fast-image';
 
 const Header = ({navigation}) => {
   const {photoURL} = useAuth();
@@ -17,7 +18,15 @@ const Header = ({navigation}) => {
           style={styles.profile}
           onPress={() => navigation.navigate(Routes.Profile)}>
           {photoURL ? (
-            <Image source={{uri: photoURL}} style={styles.photo} />
+            <FastImage
+              style={styles.photo}
+              source={{
+                uri: photoURL,
+                priority: FastImage.priority.high,
+              }}
+              resizeMode={FastImage.resizeMode.cover}
+              placeholder={<ActivityIndicator size="large" color="#0000ff" />}
+            />
           ) : (
             <View style={styles.photo} />
           )}

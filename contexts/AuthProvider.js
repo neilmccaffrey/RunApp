@@ -9,6 +9,7 @@ import {
 } from '../api/firestore';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import FastImage from 'react-native-fast-image';
 
 // Create AuthContext
 export const AuthContext = createContext();
@@ -30,6 +31,11 @@ export const AuthProvider = ({children}) => {
         setDisplayName(initialName);
         setPhotoURL(initialPhoto);
         await AsyncStorage.setItem('user', JSON.stringify(user));
+
+        // Preload and cache the profile photo
+        if (initialPhoto) {
+          FastImage.preload([{uri: initialPhoto}]);
+        }
       } catch (error) {
         Toast.show({
           type: 'error',
@@ -150,6 +156,7 @@ export const AuthProvider = ({children}) => {
     <AuthContext.Provider
       value={{
         user,
+        login,
         logout,
         initializing,
         photoURL,

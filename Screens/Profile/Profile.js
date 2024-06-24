@@ -8,8 +8,8 @@ import {
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import React, {useState} from 'react';
 import {
+  ActivityIndicator,
   Alert,
-  Image,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -32,6 +32,7 @@ import {
   GestureHandlerRootView,
   PanGestureHandler,
 } from 'react-native-gesture-handler';
+import FastImage from 'react-native-fast-image';
 
 const Profile = ({navigation}) => {
   const {logout, updateUserProfile, displayName, photoURL, deletePhoto} =
@@ -179,7 +180,17 @@ const Profile = ({navigation}) => {
                   {photoURL && (
                     <View style={styles.alignPhotoEditTextCenter}>
                       <TouchableOpacity onPress={() => setModalVisible(true)}>
-                        <Image source={{uri: photoURL}} style={styles.photo} />
+                        <FastImage
+                          style={styles.photo}
+                          source={{
+                            uri: photoURL,
+                            priority: FastImage.priority.high,
+                          }}
+                          resizeMode={FastImage.resizeMode.cover}
+                          placeholder={
+                            <ActivityIndicator size="large" color="#0000ff" />
+                          }
+                        />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.editPhotoMargin}
