@@ -35,12 +35,14 @@
   [FIRMessaging messaging].APNSToken = deviceToken;
 }
 
-- (UIView *)createRootViewWithBridge:(RCTBridge *)bridge
-                          moduleName:(NSString *)moduleName
-                           initProps:(NSDictionary *)initProps {
-  UIView *rootView = [super createRootViewWithBridge:bridge moduleName:moduleName initProps:initProps];
-  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView]; // ⬅️ initialize the splash screen
+- (UIView *)customiseView:(RCTBridge *)bridge
+                moduleName:(NSString *)moduleName
+                 initProps:(NSDictionary *)initProps {
+  RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
+                                                   moduleName:moduleName
+                                            initialProperties:initProps];
+  rootView.backgroundColor = [UIColor whiteColor]; 
+  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView]; // Initialize the splash screen
   return rootView;
 }
-
 @end
