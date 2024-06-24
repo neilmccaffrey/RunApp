@@ -189,7 +189,8 @@ const Comments = ({isOpen, onClose, postItem}) => {
                         rightOpenValue={-150}
                         renderItem={({item}) => {
                           return (
-                            <View style={styles.commentContainer}>
+                            <View
+                              style={[styles.commentContainer, styles.border]}>
                               <FastImage
                                 style={styles.commentImage}
                                 source={{

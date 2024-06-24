@@ -66,10 +66,12 @@ const styles = StyleSheet.create({
   },
   commentContainer: {
     flexDirection: 'row',
-    marginBottom: verticalScale(15),
     flex: 1,
     backgroundColor: '#fff',
     position: 'relative',
+    marginBottom: verticalScale(8),
+    paddingVertical: verticalScale(5),
+    paddingHorizontal: horizontalScale(8),
   },
   commentImage: {
     borderWidth: horizontalScale(2),
@@ -77,7 +79,11 @@ const styles = StyleSheet.create({
     width: horizontalScale(40),
     height: horizontalScale(40),
     borderRadius: 25,
-    marginRight: 10,
+    marginRight: horizontalScale(10),
+  },
+  border: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#EFF2F6',
   },
   displayNameText: {
     color: '#36454F',
@@ -94,7 +100,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    paddingLeft: 15,
+    paddingLeft: horizontalScale(15),
   },
   backRightButton: {
     alignItems: 'center',
