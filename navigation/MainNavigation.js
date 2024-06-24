@@ -11,6 +11,7 @@ import Profile from '../Screens/Profile/Profile';
 import UpdatePost from '../Screens/UpdatePost/UpdatePost';
 import {ActivityIndicator, View} from 'react-native';
 import Info from '../Screens/Info/Info';
+import styles from './styles';
 
 const Stack = createStackNavigator();
 
@@ -27,7 +28,7 @@ const MainNavigation = () => {
   if (initializing || !initialRoute) {
     // Render a loading indicator while determining initial route
     return (
-      <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+      <View style={styles.acitivityIndicator}>
         <ActivityIndicator size="large" color="#B57EDC" />
       </View>
     );

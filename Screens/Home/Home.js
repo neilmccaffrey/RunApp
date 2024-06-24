@@ -14,6 +14,7 @@ import {horizontalScale} from '../../Styles/scaling';
 import ItemComponent from '../../components/ItemComponent/ItemComponent';
 import {fetchDisplayNamesForAttendees} from '../../api/firestore';
 import FastImage from 'react-native-fast-image';
+import {useFocusEffect} from '@react-navigation/native';
 
 const {width} = Dimensions.get('window');
 
@@ -103,6 +104,13 @@ const Home = ({navigation}) => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  //update data on return to homescreen. ensures all post/profile updates are accurate
+  useFocusEffect(
+    React.useCallback(() => {
+      fetchData();
+    }, []),
+  );
 
   const fetchMore = async () => {
     if (loadingMore || !hasMore) {
