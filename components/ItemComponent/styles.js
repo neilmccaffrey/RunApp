@@ -8,7 +8,7 @@ const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   pictures: {
-    height: verticalScale(200),
+    height: verticalScale(240),
     width: width - horizontalScale(10),
     marginHorizontal: horizontalScale(5),
     borderRadius: 10,
