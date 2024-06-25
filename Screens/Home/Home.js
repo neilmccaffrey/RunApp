@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Dimensions,
@@ -127,8 +127,8 @@ const Home = ({navigation}) => {
       return null;
     }
     return (
-      <View style={{paddingVertical: 20}}>
-        <ActivityIndicator size="large" color="#36454F" />
+      <View>
+        <ActivityIndicator size="large" color="#B57EDC" />
       </View>
     );
   };
@@ -178,6 +178,8 @@ const Home = ({navigation}) => {
           handleScroll={handleScroll}
           renderPagination={renderPagination}
           onDelete={handleDelete}
+          onCommentAdded={handleRefresh}
+          onAttendanceUpdated={handleAttendanceRefresh}
         />
       );
     },
@@ -188,9 +190,74 @@ const Home = ({navigation}) => {
     setData(prevItems => prevItems.filter(item => item.id !== itemId));
   };
 
+  //handle refresh to update comments count for only the specific post
+  const handleRefresh = async postId => {
+    try {
+      const updatedPostDoc = await firestore()
+        .collection('posts')
+        .doc(postId)
+        .get();
+      const updatedPostData = updatedPostDoc.data();
+
+      // Ensure eventTime is converted to a JavaScript Date object
+      if (updatedPostData.eventTime) {
+        updatedPostData.eventTime = new Date(
+          updatedPostData.eventTime.seconds * 1000 +
+            updatedPostData.eventTime.nanoseconds / 1000000,
+        );
+      }
+
+      const updatedPost = {
+        id: updatedPostDoc.id,
+        ...updatedPostData,
+      };
+
+      setData(prevData =>
+        prevData.map(post => (post.id === postId ? updatedPost : post)),
+      );
+    } catch (error) {
+      console.error('Error refreshing post data: ', error);
+    }
+  };
+
+  //update the Going count and isGoing list for only the specific post
+  const handleAttendanceRefresh = async postId => {
+    try {
+      const updatedPostDoc = await firestore()
+        .collection('posts')
+        .doc(postId)
+        .get();
+      const updatedPostData = updatedPostDoc.data();
+
+      // Ensure eventTime is converted to a JavaScript Date object
+      if (updatedPostData.eventTime) {
+        updatedPostData.eventTime = new Date(
+          updatedPostData.eventTime.seconds * 1000 +
+            updatedPostData.eventTime.nanoseconds / 1000000,
+        );
+      }
+
+      const updatedPost = {
+        id: updatedPostDoc.id,
+        ...updatedPostData,
+      };
+
+      setData(prevData =>
+        prevData.map(post => (post.id === postId ? updatedPost : post)),
+      );
+    } catch (error) {
+      console.error('Error refreshing post data: ', error);
+    }
+  };
+
   return (
     <SafeAreaView style={[globalStyle.backgroundWhite, globalStyle.flex]}>
       <Header navigation={navigation} />
+      {loading && data.length === 0 && (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#B57EDC" />
+        </View>
+      )}
       <FlatList
         data={data}
         renderItem={renderItem}
@@ -199,11 +266,6 @@ const Home = ({navigation}) => {
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
       />
-      {loading && data.length === 0 && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#B57EDC" />
-        </View>
-      )}
     </SafeAreaView>
   );
 };

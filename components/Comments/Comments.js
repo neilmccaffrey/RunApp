@@ -35,7 +35,7 @@ import {
 } from 'react-native-gesture-handler';
 import FastImage from 'react-native-fast-image';
 
-const Comments = ({isOpen, onClose, postItem}) => {
+const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
   const {user, displayName, photoURL} = useAuth();
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState(postItem.comments);
@@ -86,6 +86,7 @@ const Comments = ({isOpen, onClose, postItem}) => {
       if (comment.photoURL) {
         FastImage.preload([{uri: comment.photoURL}]);
       }
+      onCommentAdded(postItem.id);
       Toast.show({
         type: 'success',
         text1: 'Comment added successfully',

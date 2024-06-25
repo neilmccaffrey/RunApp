@@ -34,7 +34,15 @@ import Comments from '../Comments/Comments';
 import FastImage from 'react-native-fast-image';
 
 const ItemComponent = memo(
-  ({item, itemIndex, handleScroll, renderPagination, onDelete}) => {
+  ({
+    item,
+    itemIndex,
+    handleScroll,
+    renderPagination,
+    onDelete,
+    onCommentAdded,
+    onAttendanceUpdated,
+  }) => {
     const {user} = useAuth();
     const navigation = useNavigation();
     const [goingModal, setGoingModal] = useState(false);
@@ -156,6 +164,9 @@ const ItemComponent = memo(
 
         // Update the attendance button state after Firestore update
         setAttendanceButton(newAttendanceButtonState);
+
+        // Notify parent component to refresh the specific post data
+        onAttendanceUpdated(item.id);
       } catch (error) {
         Toast.show({
           type: 'error',
@@ -269,6 +280,7 @@ const ItemComponent = memo(
           isOpen={commentModal}
           onClose={closeCommentModal}
           postItem={item}
+          onCommentAdded={onCommentAdded}
         />
 
         {/* Edit/delete modal */}
