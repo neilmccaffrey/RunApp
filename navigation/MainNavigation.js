@@ -21,9 +21,12 @@ const MainNavigation = () => {
 
   useEffect(() => {
     if (!initializing) {
-      setInitialRoute(user ? Routes.Home : Routes.Login);
+      // Only update the initial route if it hasn't been set yet
+      if (initialRoute === null) {
+        setInitialRoute(user ? Routes.Home : Routes.Login);
+      }
     }
-  }, [user, initializing]);
+  }, [user, initializing, initialRoute]);
 
   if (initializing || !initialRoute) {
     // Render a loading indicator while determining initial route

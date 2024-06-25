@@ -83,7 +83,7 @@ const ItemComponent = memo(
       resetState();
       getProfileData();
       checkUserAttendance();
-    }, [item.userId, item.id, item.isGoing, user]);
+    }, [item.userId, item.isGoing, user]);
 
     const images = useMemo(() => {
       const imageArray = [];

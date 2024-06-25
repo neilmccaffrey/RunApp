@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {memo, useEffect, useState} from 'react';
 import {
   faCircleArrowUp,
   faTrashCan,
@@ -248,4 +248,4 @@ const Comments = ({isOpen, onClose, postItem}) => {
   );
 };
 
-export default Comments;
+export default memo(Comments);
