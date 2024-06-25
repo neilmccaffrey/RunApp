@@ -272,7 +272,10 @@ const Post = ({navigation}) => {
                         <Image source={photo1} style={styles.photo} />
                         <TouchableOpacity
                           style={styles.trashCan}
-                          onPress={() => handleDeletePhoto('1')}>
+                          onPress={() => {
+                            Keyboard.dismiss();
+                            handleDeletePhoto('1');
+                          }}>
                           <FontAwesomeIcon
                             icon={faTrashCan}
                             color={'white'}
@@ -301,7 +304,10 @@ const Post = ({navigation}) => {
                         <Image source={photo2} style={styles.photo} />
                         <TouchableOpacity
                           style={styles.trashCan}
-                          onPress={() => handleDeletePhoto('2')}>
+                          onPress={() => {
+                            Keyboard.dismiss();
+                            handleDeletePhoto('2');
+                          }}>
                           <FontAwesomeIcon
                             icon={faTrashCan}
                             color={'white'}
@@ -330,7 +336,10 @@ const Post = ({navigation}) => {
                         <Image source={photo3} style={styles.photo} />
                         <TouchableOpacity
                           style={styles.trashCan}
-                          onPress={() => handleDeletePhoto('3')}>
+                          onPress={() => {
+                            Keyboard.dismiss();
+                            handleDeletePhoto('3');
+                          }}>
                           <FontAwesomeIcon
                             icon={faTrashCan}
                             color={'white'}
