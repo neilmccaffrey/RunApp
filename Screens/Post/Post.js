@@ -255,7 +255,10 @@ const Post = ({navigation}) => {
                     {!photo1 && (
                       <TouchableOpacity
                         style={styles.addPhoto}
-                        onPress={() => selectPhoto('1')}>
+                        onPress={() => {
+                          Keyboard.dismiss();
+                          selectPhoto('1');
+                        }}>
                         <Text style={styles.plus}>+</Text>
                         <FontAwesomeIcon
                           icon={faCamera}
@@ -281,7 +284,10 @@ const Post = ({navigation}) => {
                     {!photo2 && (
                       <TouchableOpacity
                         style={styles.addPhoto}
-                        onPress={() => selectPhoto('2')}>
+                        onPress={() => {
+                          Keyboard.dismiss();
+                          selectPhoto('2');
+                        }}>
                         <Text style={styles.plus}>+</Text>
                         <FontAwesomeIcon
                           icon={faCamera}
@@ -307,7 +313,10 @@ const Post = ({navigation}) => {
                     {!photo3 && (
                       <TouchableOpacity
                         style={styles.addPhoto}
-                        onPress={() => selectPhoto('3')}>
+                        onPress={() => {
+                          Keyboard.dismiss();
+                          selectPhoto('3');
+                        }}>
                         <Text style={styles.plus}>+</Text>
                         <FontAwesomeIcon
                           icon={faCamera}
