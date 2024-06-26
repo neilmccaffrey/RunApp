@@ -1,5 +1,11 @@
 import React from 'react';
-import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import styles from './styles';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import {faCircleInfo, faPenToSquare} from '@fortawesome/free-solid-svg-icons';
@@ -28,7 +34,10 @@ const Header = ({navigation}) => {
               placeholder={<ActivityIndicator size="large" color="#B57EDC" />}
             />
           ) : (
-            <View style={styles.photo} />
+            <Image
+              style={styles.photo}
+              source={require('../../assets/images/default-profile-pic.jpg')}
+            />
           )}
           <Text style={styles.text}>Profile</Text>
         </TouchableOpacity>

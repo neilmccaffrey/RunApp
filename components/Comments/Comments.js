@@ -15,6 +15,7 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import styles from './styles';
 import {SwipeListView} from 'react-native-swipe-list-view';
@@ -192,20 +193,27 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
                           return (
                             <View
                               style={[styles.commentContainer, styles.border]}>
-                              <FastImage
-                                style={styles.commentImage}
-                                source={{
-                                  uri: item.photoURL,
-                                  priority: FastImage.priority.high,
-                                }}
-                                resizeMode={FastImage.resizeMode.cover}
-                                placeholder={
-                                  <ActivityIndicator
-                                    size="large"
-                                    color="#0000ff"
-                                  />
-                                }
-                              />
+                              {item.photoURL ? (
+                                <FastImage
+                                  style={styles.commentImage}
+                                  source={{
+                                    uri: item.photoURL,
+                                    priority: FastImage.priority.high,
+                                  }}
+                                  resizeMode={FastImage.resizeMode.cover}
+                                  placeholder={
+                                    <ActivityIndicator
+                                      size="large"
+                                      color="#0000ff"
+                                    />
+                                  }
+                                />
+                              ) : (
+                                <Image
+                                  style={styles.commentImage}
+                                  source={require('../../assets/images/default-profile-pic.jpg')}
+                                />
+                              )}
                               <View>
                                 <Text style={styles.displayNameText}>
                                   {item.displayName}

@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
   FlatList,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import styles from './styles';
 import ShowMore from '../ShowMore/ShowMore';
@@ -179,16 +180,22 @@ const ItemComponent = memo(
       <View style={styles.itemsContainer}>
         <View style={styles.photoTextContainer}>
           <View style={styles.photoTextView}>
-            <FastImage
-              style={styles.photo}
-              source={{
-                uri: item.profilePhoto, // Use profile photo from the post document
-                priority: FastImage.priority.high,
-              }}
-              resizeMode={FastImage.resizeMode.cover}
-              placeholder={<ActivityIndicator size="large" color="#B57EDC" />}
-            />
-
+            {item.profilePhoto ? (
+              <FastImage
+                style={styles.photo}
+                source={{
+                  uri: item.profilePhoto, // Use profile photo from the post document
+                  priority: FastImage.priority.high,
+                }}
+                resizeMode={FastImage.resizeMode.cover}
+                placeholder={<ActivityIndicator size="large" color="#B57EDC" />}
+              />
+            ) : (
+              <Image
+                style={styles.photo}
+                source={require('../../assets/images/default-profile-pic.jpg')}
+              />
+            )}
             <Text style={styles.displayNameText}>{displayName}</Text>
           </View>
           {usersPost && (
