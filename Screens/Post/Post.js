@@ -150,8 +150,10 @@ const Post = ({navigation}) => {
         photo2,
         photo3,
         photoURL,
+        () => {
+          navigation.navigate(Routes.Home);
+        },
       );
-      navigation.navigate(Routes.Home);
     }
   };
 

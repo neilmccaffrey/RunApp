@@ -13,13 +13,15 @@ export const createPost = async (
   photo2,
   photo3,
   photoURL,
+  onPostCreated, // Callback function to refresh posts
 ) => {
   if (!user) {
     throw new Error('User not authenticated');
   }
 
   try {
-    await firestore()
+    //create a docRef while adding post to store to get postId for attendance
+    const docRef = await firestore()
       .collection('posts')
       .add({
         title,
@@ -33,6 +35,30 @@ export const createPost = async (
         profilePhoto: photoURL,
         userId: user.uid,
       });
+
+    // Fetch the document
+    const docSnapshot = await docRef.get();
+    if (docSnapshot.exists) {
+      const docData = docSnapshot.data();
+
+      // Convert Firestore Timestamp to Date object
+      const eventDateObject = docData.eventTime.toDate();
+
+      // Update attendance so user who creates post is on Going list, notification will be sent, and I'll be there button is active
+      await updateAttendanceInFirestore(
+        docRef.id,
+        user,
+        true,
+        docData.location,
+        eventDateObject,
+      );
+    }
+
+    // Call the callback function to refresh posts
+    if (onPostCreated) {
+      onPostCreated();
+    }
+
     Toast.show({
       type: 'success',
       text1: 'Event Created',
