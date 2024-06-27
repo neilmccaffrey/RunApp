@@ -13,6 +13,7 @@ import Button from '../../components/Button/Button';
 import Toast from 'react-native-toast-message';
 import {getErrorMessage} from '../../components/getErrorMessage';
 import {useAuth} from '../../contexts/AuthProvider';
+import {CommonActions} from '@react-navigation/native';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -23,9 +24,15 @@ const Login = ({navigation}) => {
   const handleLogin = async () => {
     try {
       login(email, password);
-      // Navigate to Home screen
-      navigation.navigate(Routes.Home);
+      // Reset the navigation stack and navigate to Home screen
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{name: Routes.Home}],
+        }),
+      );
     } catch (error) {
+      console.log(error.message);
       Toast.show({
         type: 'error',
         text1: getErrorMessage(error),

@@ -15,12 +15,14 @@ import ItemComponent from '../../components/ItemComponent/ItemComponent';
 import {fetchDisplayNamesForAttendees} from '../../api/firestore';
 import FastImage from 'react-native-fast-image';
 import {useFocusEffect} from '@react-navigation/native';
+import {useAuth} from '../../contexts/AuthProvider';
 
 const {width} = Dimensions.get('window');
 
 const Home = ({navigation, route}) => {
   const PAGE_SIZE = 5;
   const flatListRef = useRef(null);
+  const {authenticating} = useAuth();
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -110,8 +112,10 @@ const Home = ({navigation, route}) => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (!authenticating) {
+      fetchData();
+    }
+  }, [authenticating]);
 
   // Update data on return to Home screen. Ensures all post/profile updates are accurate
   useFocusEffect(

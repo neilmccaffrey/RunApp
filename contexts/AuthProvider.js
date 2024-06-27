@@ -20,6 +20,7 @@ export const AuthProvider = ({children}) => {
   const [displayName, setDisplayName] = useState('');
   const [photoURL, setPhotoURL] = useState(null);
   const [initializing, setInitializing] = useState(true);
+  const [authenticating, setAuthenticating] = useState(false);
 
   // Handle user state changes
   const onAuthStateChanged = async user => {
@@ -37,6 +38,7 @@ export const AuthProvider = ({children}) => {
           FastImage.preload([{uri: initialPhoto}]);
         }
       } catch (error) {
+        console.log(error.message);
         Toast.show({
           type: 'error',
           text1: error.message,
@@ -51,6 +53,7 @@ export const AuthProvider = ({children}) => {
     if (initializing) {
       setInitializing(false);
     }
+    setAuthenticating(false);
   };
 
   // Listen for authentication state changes
@@ -77,6 +80,7 @@ export const AuthProvider = ({children}) => {
   }, []);
 
   const login = async (email, password) => {
+    setAuthenticating(true);
     try {
       const userCredential = await auth().signInWithEmailAndPassword(
         email,
@@ -90,10 +94,12 @@ export const AuthProvider = ({children}) => {
       setPhotoURL(initialPhoto);
       await AsyncStorage.setItem('user', JSON.stringify(user));
     } catch (error) {
+      console.log(error.message);
       Toast.show({
         type: 'error',
         text1: error.message,
       });
+      setAuthenticating(false);
       throw error;
     }
   };
@@ -163,6 +169,7 @@ export const AuthProvider = ({children}) => {
         displayName,
         deletePhoto,
         updateUserProfile,
+        authenticating,
       }}>
       {children}
     </AuthContext.Provider>
