@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Dimensions,
@@ -18,8 +18,9 @@ import {useFocusEffect} from '@react-navigation/native';
 
 const {width} = Dimensions.get('window');
 
-const Home = ({navigation}) => {
+const Home = ({navigation, route}) => {
   const PAGE_SIZE = 5;
+  const flatListRef = useRef(null);
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,7 +63,7 @@ const Home = ({navigation}) => {
     FastImage.preload(imageUris);
   };
 
-  const fetchData = async (lastDoc = null) => {
+  const fetchData = async (lastDoc = null, reset = false) => {
     try {
       const query = firestore()
         .collection('posts')
@@ -93,8 +94,13 @@ const Home = ({navigation}) => {
 
       await preloadImages(documents);
 
-      setData(prevData => (lastDoc ? [...prevData, ...documents] : documents));
+      setData(prevData => (reset ? documents : [...prevData, ...documents]));
       setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+
+      // Scroll to top if reset
+      if (reset && flatListRef.current) {
+        flatListRef.current.scrollToOffset({animated: false, offset: 0});
+      }
     } catch (error) {
       console.error(error.message);
     } finally {
@@ -107,11 +113,16 @@ const Home = ({navigation}) => {
     fetchData();
   }, []);
 
-  //update data on return to homescreen. ensures all post/profile updates are accurate
+  // Update data on return to Home screen. Ensures all post/profile updates are accurate
   useFocusEffect(
     React.useCallback(() => {
-      fetchData();
-    }, []),
+      const {refreshNeeded} = route.params || {};
+      if (refreshNeeded) {
+        setHasMore(true); //reset infinite scroll
+        fetchData(null, true);
+        navigation.setParams({refreshNeeded: false}); // Reset the parameter
+      }
+    }, [route.params]),
   );
 
   const fetchMore = async () => {
@@ -259,15 +270,59 @@ const Home = ({navigation}) => {
         </View>
       )}
       <FlatList
+        ref={flatListRef}
         data={data}
         renderItem={renderItem}
         keyExtractor={item => item.id} // Ensure a unique key
         onEndReached={fetchMore}
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
+        windowSize={2}
+        removeClippedSubviews={true} //only load what is in visible area of scrollview for performance
       />
     </SafeAreaView>
   );
 };
 
 export default Home;
+
+// const fetchData = async (lastDoc = null, reset = false) => {
+//   try {
+//     const query = firestore()
+//       .collection('posts')
+//       .orderBy('createdAt', 'desc')
+//       .limit(PAGE_SIZE);
+
+//     const snapshot = lastDoc
+//       ? await query.startAfter(lastDoc).get()
+//       : await query.get();
+//     const documents = await Promise.all(
+//       snapshot.docs.map(async doc => {
+//         const postData = doc.data();
+//         const attendeesWithDisplayNames = await fetchDisplayNamesForAttendees(
+//           postData.isGoing || [],
+//         );
+//         return {
+//           id: doc.id,
+//           ...postData,
+//           eventTime: convertTimestampToDate(postData.eventTime),
+//           isGoing: attendeesWithDisplayNames,
+//         };
+//       }),
+//     );
+
+//     if (documents.length < PAGE_SIZE) {
+//       setHasMore(false);
+//     }
+
+//     await preloadImages(documents);
+
+//     setData(prevData => (reset ? documents : [...prevData, ...documents]));
+//     setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
+//   } catch (error) {
+//     console.error(error.message);
+//   } finally {
+//     setLoading(false);
+//     setLoadingMore(false);
+//   }
+// };

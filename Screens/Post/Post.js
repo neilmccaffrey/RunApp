@@ -30,6 +30,7 @@ import {useAuth} from '../../contexts/AuthProvider';
 import {
   GestureHandlerRootView,
   PanGestureHandler,
+  State,
 } from 'react-native-gesture-handler';
 
 const Post = ({navigation}) => {
@@ -151,7 +152,7 @@ const Post = ({navigation}) => {
         photo3,
         photoURL,
         () => {
-          navigation.navigate(Routes.Home);
+          navigation.navigate(Routes.Home, {refreshNeeded: true});
         },
       );
     }
@@ -163,9 +164,20 @@ const Post = ({navigation}) => {
     }
   };
 
+  //swipe to go back
+  const onHandlerStateChange = ({nativeEvent}) => {
+    if (nativeEvent.state === State.END) {
+      if (nativeEvent.translationX > 100) {
+        navigation.goBack();
+      }
+    }
+  };
+
   return (
     <GestureHandlerRootView style={globalStyle.flex}>
-      <PanGestureHandler onGestureEvent={onSwipeGesture}>
+      <PanGestureHandler
+        onGestureEvent={onSwipeGesture}
+        onHandlerStateChange={onHandlerStateChange}>
         <KeyboardAvoidingView behavior={'padding'} style={globalStyle.flex}>
           <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <SafeAreaView
