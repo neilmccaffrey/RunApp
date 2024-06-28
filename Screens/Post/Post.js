@@ -208,6 +208,7 @@ const Post = ({navigation}) => {
                       accentColor="#B57EDC"
                       textColor="#B57EDC"
                       onChange={onChangeDate}
+                      minimumDate={new Date()}
                     />
                   </View>
                   {/* Picker for time  */}

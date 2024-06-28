@@ -10,13 +10,13 @@ const useLogout = () => {
 
   const logout = async () => {
     try {
+      await auth().signOut();
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
           routes: [{name: Routes.Login}],
         }),
       );
-      await auth().signOut();
       setUser(null);
       setDisplayName('');
       setPhotoURL(null);
