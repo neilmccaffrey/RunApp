@@ -154,6 +154,9 @@ const styles = StyleSheet.create({
     marginLeft: horizontalScale(3),
     paddingTop: verticalScale(2),
   },
+  disabled: {
+    opacity: 0.5,
+  },
 });
 
 export default styles;

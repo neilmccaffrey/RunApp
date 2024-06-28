@@ -245,7 +245,13 @@ const ItemComponent = memo(
         <ShowMore text={item.details} />
 
         <View style={styles.postFooterContainer}>
-          <TouchableOpacity style={styles.touchableRow} onPress={handleIsGoing}>
+          <TouchableOpacity
+            style={[
+              styles.touchableRow,
+              item.eventTime < new Date() && styles.disabled,
+            ]}
+            onPress={handleIsGoing}
+            disabled={item.eventTime < new Date()}>
             <View style={styles.iconTextContainer}>
               <FontAwesomeIcon
                 icon={attendanceButton ? faThumbsUpSolid : faThumbsUp}
