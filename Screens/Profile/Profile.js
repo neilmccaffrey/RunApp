@@ -34,13 +34,25 @@ import {
   State,
 } from 'react-native-gesture-handler';
 import FastImage from 'react-native-fast-image';
+import useLogout from '../../utils/useLogout';
 
 const Profile = ({navigation}) => {
-  const {logout, updateUserProfile, displayName, photoURL, deletePhoto} =
-    useAuth();
+  const {updateUserProfile, displayName, photoURL, deletePhoto} = useAuth();
   const [modalVisible, setModalVisible] = useState(false);
   const [newDisplayName, setNewDisplayName] = useState(displayName);
   const [isUploading, setIsUploading] = useState(false);
+
+  const logout = useLogout();
+
+  const handleLogout = async () => {
+    try {
+      // Close modals before logging out to avoid on animated value warning
+      setModalVisible(false);
+      await logout();
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
 
   //select photo from library
   const selectPhoto = () => {
@@ -161,11 +173,7 @@ const Profile = ({navigation}) => {
                     color={'#B57EDC'}
                   />
                 </Pressable>
-                <TouchableOpacity
-                  onPress={() => {
-                    logout();
-                    navigation.navigate(Routes.Login);
-                  }}>
+                <TouchableOpacity onPress={handleLogout}>
                   <Text style={styles.logoutText}>Logout</Text>
                 </TouchableOpacity>
               </View>

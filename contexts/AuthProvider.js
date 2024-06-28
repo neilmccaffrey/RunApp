@@ -104,19 +104,6 @@ export const AuthProvider = ({children}) => {
     }
   };
 
-  const logout = async () => {
-    try {
-      await auth().signOut();
-      setUser(null);
-      setDisplayName('');
-      setPhotoURL(null);
-      await AsyncStorage.removeItem('user');
-    } catch (error) {
-      console.error('Error during logout:', error);
-      throw error;
-    }
-  };
-
   // Update user profile function
   const updateUserProfile = async (newDisplayName, newPhotoURL) => {
     try {
@@ -163,13 +150,15 @@ export const AuthProvider = ({children}) => {
       value={{
         user,
         login,
-        logout,
         initializing,
         photoURL,
         displayName,
         deletePhoto,
         updateUserProfile,
         authenticating,
+        setUser,
+        setDisplayName,
+        setPhotoURL,
       }}>
       {children}
     </AuthContext.Provider>
