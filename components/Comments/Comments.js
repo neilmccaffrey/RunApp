@@ -1,4 +1,4 @@
-import React, {memo, useEffect, useState} from 'react';
+import React, {memo, useEffect, useRef, useState} from 'react';
 import {
   faCircleArrowUp,
   faTrashCan,
@@ -30,16 +30,15 @@ import {
 import {useAuth} from '../../contexts/AuthProvider';
 import uuid from 'react-native-uuid';
 import globalStyle from '../../Styles/globalStyle';
-import {
-  GestureHandlerRootView,
-  PanGestureHandler,
-} from 'react-native-gesture-handler';
 import FastImage from 'react-native-fast-image';
 
 const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
   const {user, displayName, photoURL} = useAuth();
   const [newComment, setNewComment] = useState('');
   const [comments, setComments] = useState(postItem.comments);
+  const [prevScrollPos, setPrevScrollPos] = useState(0);
+
+  const scrollRef = useRef(null);
 
   // Fetch comments initially and whenever the postItem changes
   useEffect(() => {
@@ -142,118 +141,107 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
     );
   };
 
-  const onSwipeGesture = ({nativeEvent}) => {
-    if (nativeEvent.translationY > 20) {
+  const onScroll = event => {
+    const currentOffset = event.nativeEvent.contentOffset.y;
+    if (currentOffset < prevScrollPos) {
       Keyboard.dismiss();
     }
+    setPrevScrollPos(currentOffset);
   };
 
   return (
-    <GestureHandlerRootView style={globalStyle.flex}>
-      <PanGestureHandler onGestureEvent={onSwipeGesture}>
+    <View style={globalStyle.flex}>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isOpen}
+        onRequestClose={onClose}>
         <KeyboardAvoidingView behavior={'padding'} style={globalStyle.flex}>
-          <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
-            <View style={globalStyle.flex}>
-              <Modal
-                animationType="slide"
-                transparent={true}
-                visible={isOpen}
-                onRequestClose={onClose}>
-                <KeyboardAvoidingView
-                  behavior={'padding'}
-                  style={globalStyle.flex}>
-                  <TouchableWithoutFeedback onPress={onClose}>
-                    <View style={styles.overlay} />
-                  </TouchableWithoutFeedback>
-                  <View style={styles.modalView}>
-                    <TouchableOpacity
-                      onPress={onClose}
-                      style={styles.xButtonContainer}>
-                      <FontAwesomeIcon
-                        icon={faXmark}
-                        size={30}
-                        style={styles.xButton}
-                      />
-                    </TouchableOpacity>
-                    <View style={styles.flatListContainer}>
-                      <SwipeListView
-                        showsVerticalScrollIndicator={true}
-                        ListEmptyComponent={
-                          <View style={styles.emptyList}>
-                            <Text style={styles.emptyListText}>
-                              No comments yet
-                            </Text>
-                          </View>
-                        }
-                        data={comments}
-                        keyExtractor={item => item.commentId.toString()}
-                        renderHiddenItem={renderHiddenItem}
-                        rightOpenValue={-150}
-                        renderItem={({item}) => {
-                          return (
-                            <View
-                              style={[styles.commentContainer, styles.border]}>
-                              {item.photoURL ? (
-                                <FastImage
-                                  style={styles.commentImage}
-                                  source={{
-                                    uri: item.photoURL,
-                                    priority: FastImage.priority.high,
-                                  }}
-                                  resizeMode={FastImage.resizeMode.cover}
-                                  placeholder={
-                                    <ActivityIndicator
-                                      size="large"
-                                      color="#0000ff"
-                                    />
-                                  }
-                                />
-                              ) : (
-                                <Image
-                                  style={styles.commentImage}
-                                  source={require('../../assets/images/default-profile-pic.jpg')}
-                                />
-                              )}
-                              <View>
-                                <Text style={styles.displayNameText}>
-                                  {item.displayName}
-                                </Text>
-                                <Text style={styles.commentText}>
-                                  {item.text}
-                                </Text>
-                              </View>
-                            </View>
-                          );
-                        }}
-                      />
-                    </View>
-                    <View style={styles.inputContainer}>
-                      <TextInput
-                        multiline
-                        placeholder="Add a comment..."
-                        value={newComment}
-                        onChangeText={setNewComment}
-                        textAlignVertical="top"
-                        style={styles.input}
-                      />
-                      <TouchableOpacity
-                        style={styles.arrow}
-                        onPress={handleAddComment}>
-                        <FontAwesomeIcon
-                          icon={faCircleArrowUp}
-                          size={scaleFontSize(35)}
-                          color={'#B57EDC'}
-                        />
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </KeyboardAvoidingView>
-              </Modal>
-            </View>
+          <TouchableWithoutFeedback onPress={onClose}>
+            <View style={styles.overlay} />
           </TouchableWithoutFeedback>
+          <View style={styles.modalView}>
+            <TouchableOpacity onPress={onClose} style={styles.xButtonContainer}>
+              <FontAwesomeIcon
+                icon={faXmark}
+                size={30}
+                style={styles.xButton}
+              />
+            </TouchableOpacity>
+            <View style={styles.flatListContainer}>
+              <SwipeListView
+                ref={scrollRef}
+                onScroll={onScroll}
+                scrollEventThrottle={16}
+                keyboardShouldPersistTaps={'handled'}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                  <View style={styles.emptyList}>
+                    <Text style={styles.emptyListText}>No comments yet</Text>
+                  </View>
+                }
+                data={comments}
+                keyExtractor={item => item.commentId.toString()}
+                renderHiddenItem={renderHiddenItem}
+                rightOpenValue={-150}
+                renderItem={({item}) => {
+                  return (
+                    <View style={[styles.commentContainer, styles.border]}>
+                      {item.photoURL ? (
+                        <FastImage
+                          style={styles.commentImage}
+                          source={{
+                            uri: item.photoURL,
+                            priority: FastImage.priority.high,
+                          }}
+                          resizeMode={FastImage.resizeMode.cover}
+                          placeholder={
+                            <ActivityIndicator size="large" color="#0000ff" />
+                          }
+                        />
+                      ) : (
+                        <Image
+                          style={styles.commentImage}
+                          source={require('../../assets/images/default-profile-pic.jpg')}
+                        />
+                      )}
+                      <View>
+                        <Text style={styles.displayNameText}>
+                          {item.displayName}
+                        </Text>
+                        <Text style={styles.commentText}>{item.text}</Text>
+                      </View>
+                    </View>
+                  );
+                }}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <TextInput
+                multiline
+                placeholder="Add a comment..."
+                value={newComment}
+                onChangeText={setNewComment}
+                textAlignVertical="top"
+                style={styles.input}
+              />
+              <TouchableOpacity
+                style={styles.arrow}
+                onPress={() => {
+                  handleAddComment();
+                  Keyboard.dismiss();
+                }}>
+                <FontAwesomeIcon
+                  icon={faCircleArrowUp}
+                  size={scaleFontSize(35)}
+                  color={'#B57EDC'}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
         </KeyboardAvoidingView>
-      </PanGestureHandler>
-    </GestureHandlerRootView>
+      </Modal>
+    </View>
   );
 };
 

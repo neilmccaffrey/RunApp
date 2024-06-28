@@ -223,6 +223,7 @@ const ItemComponent = memo(
           </Text>
         </View>
         <ScrollView
+          keyboardShouldPersistTaps={'handled'}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}

@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
-    height: '60%',
+    height: '75%',
   },
   xButtonContainer: {
     padding: 10,
@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
+    zIndex: 10,
   },
   input: {
     flex: 1, // Make sure input takes up remaining space

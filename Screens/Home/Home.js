@@ -274,6 +274,7 @@ const Home = ({navigation, route}) => {
         </View>
       )}
       <FlatList
+        keyboardShouldPersistTaps={'handled'}
         ref={flatListRef}
         data={data}
         renderItem={renderItem}
