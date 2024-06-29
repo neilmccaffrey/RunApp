@@ -5,6 +5,9 @@ import {
   Text,
   SafeAreaView,
   TouchableOpacity,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import globalStyle from '../../Styles/globalStyle';
 import styles from './styles';
@@ -14,6 +17,10 @@ import Toast from 'react-native-toast-message';
 import {getErrorMessage} from '../../components/getErrorMessage';
 import {useAuth} from '../../contexts/AuthProvider';
 import {CommonActions} from '@react-navigation/native';
+import {
+  GestureHandlerRootView,
+  PanGestureHandler,
+} from 'react-native-gesture-handler';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -23,7 +30,12 @@ const Login = ({navigation}) => {
 
   const handleLogin = async () => {
     try {
-      login(email, password);
+      await login(email, password);
+
+      // Reset the email and password state
+      setEmail('');
+      setPassword('');
+
       // Reset the navigation stack and navigate to Home screen
       navigation.dispatch(
         CommonActions.reset({
@@ -55,49 +67,64 @@ const Login = ({navigation}) => {
     return false;
   };
 
+  const onSwipeGesture = ({nativeEvent}) => {
+    if (nativeEvent.translationY > 20) {
+      Keyboard.dismiss();
+    }
+  };
+
   return (
-    <SafeAreaView style={[globalStyle.backgroundWhite, globalStyle.flex]}>
-      <View style={styles.container}>
-        <View style={styles.boxContainer}>
-          <View style={styles.loginTextView}>
-            <Text style={styles.loginText}>Login</Text>
-          </View>
-          <TextInput
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            style={styles.input}
-          />
-          <TextInput
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            style={styles.input}
-            secureTextEntry
-          />
+    <GestureHandlerRootView style={globalStyle.flex}>
+      <PanGestureHandler onGestureEvent={onSwipeGesture}>
+        <KeyboardAvoidingView behavior={'padding'} style={globalStyle.flex}>
+          <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+            <SafeAreaView
+              style={[globalStyle.backgroundWhite, globalStyle.flex]}>
+              <View style={styles.container}>
+                <View style={styles.boxContainer}>
+                  <View style={styles.loginTextView}>
+                    <Text style={styles.loginText}>Login</Text>
+                  </View>
+                  <TextInput
+                    placeholder="Email"
+                    value={email}
+                    onChangeText={setEmail}
+                    style={styles.input}
+                  />
+                  <TextInput
+                    placeholder="Password"
+                    value={password}
+                    onChangeText={setPassword}
+                    style={styles.input}
+                    secureTextEntry
+                  />
 
-          <Button
-            title={'Login'}
-            onPress={handleLogin}
-            isDisabled={handleDisabled()}
-          />
+                  <Button
+                    title={'Login'}
+                    onPress={handleLogin}
+                    isDisabled={handleDisabled()}
+                  />
 
-          <TouchableOpacity
-            style={styles.signupButton}
-            onPress={handleForgotPasswordPress}>
-            <Text style={styles.signupButtonText}>Forgot Password</Text>
-          </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.signupButton}
+                    onPress={handleForgotPasswordPress}>
+                    <Text style={styles.signupButtonText}>Forgot Password</Text>
+                  </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.signupButton}
-            onPress={handleSignUpPress}>
-            <Text style={styles.signupButtonText}>
-              Don't have an account yet? Click here to sign up!
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </SafeAreaView>
+                  <TouchableOpacity
+                    style={styles.signupButton}
+                    onPress={handleSignUpPress}>
+                    <Text style={styles.signupButtonText}>
+                      Don't have an account yet? Click here to sign up!
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </SafeAreaView>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
+      </PanGestureHandler>
+    </GestureHandlerRootView>
   );
 };
 
