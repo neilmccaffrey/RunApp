@@ -229,6 +229,7 @@ const Post = ({navigation}) => {
                     <Text style={styles.label}>Title:</Text>
                     <TextInput
                       placeholder="Type of event/group name"
+                      maxLength={20}
                       value={title}
                       onChangeText={setTitle}
                       style={styles.input}
@@ -244,6 +245,7 @@ const Post = ({navigation}) => {
                     </View>
                     <TextInput
                       placeholder="Where to meet"
+                      maxLength={35}
                       value={location}
                       onChangeText={text => {
                         setLocation(text);

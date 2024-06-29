@@ -74,18 +74,21 @@ export const createPost = async (
 };
 
 //update post
-export const updatePostInFirestore = async ({
-  id,
-  user,
-  title,
-  location,
-  details,
-  eventTime,
-  photo1,
-  photo2,
-  photo3,
-  photoURL,
-}) => {
+export const updatePostInFirestore = async (
+  {
+    id,
+    user,
+    title,
+    location,
+    details,
+    eventTime,
+    photo1,
+    photo2,
+    photo3,
+    photoURL,
+  },
+  onPostUpdated,
+) => {
   if (!user) {
     throw new Error('User not authenticated');
   }
@@ -106,6 +109,9 @@ export const updatePostInFirestore = async ({
         createdAt: firestore.FieldValue.serverTimestamp(),
         userId: user.uid,
       });
+    if (onPostUpdated) {
+      onPostUpdated();
+    }
   } catch (error) {
     throw error;
   }

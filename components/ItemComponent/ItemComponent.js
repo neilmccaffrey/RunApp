@@ -218,9 +218,7 @@ const ItemComponent = memo(
               @{dateFormat(item.eventTime, 'h:MM TT')}
             </Text>
           </View>
-          <Text style={styles.dateTimeLocationText}>
-            Location: {item.location}
-          </Text>
+          <Text style={styles.dateTimeLocationText}>{item.location}</Text>
         </View>
         <ScrollView
           keyboardShouldPersistTaps={'handled'}

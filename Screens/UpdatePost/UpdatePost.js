@@ -35,9 +35,9 @@ import {
   PanGestureHandler,
   State,
 } from 'react-native-gesture-handler';
+import {Routes} from '../../navigation/Routes';
 
-const UpdatePost = () => {
-  const navigation = useNavigation();
+const UpdatePost = ({navigation}) => {
   const route = useRoute();
   const {
     id,
@@ -159,27 +159,31 @@ const UpdatePost = () => {
 
   const handleUpdate = async eventTime => {
     try {
-      await updatePostInFirestore({
-        id,
-        title,
-        location,
-        details,
-        eventTime,
-        photo1: photo1,
-        photo2: photo2,
-        photo3: photo3,
-        photoURL,
-        user,
-      });
+      await updatePostInFirestore(
+        {
+          id,
+          title,
+          location,
+          details,
+          eventTime,
+          photo1: photo1,
+          photo2: photo2,
+          photo3: photo3,
+          photoURL,
+          user,
+        },
+        async () => {
+          // Update notification times for all users signed up for this event and ensure it is called before navigating away
+          await updateNotificationTimes(eventTime, id);
 
-      // Update notification times for all users signed up for this event
-      await updateNotificationTimes(eventTime, id);
+          navigation.navigate(Routes.Home, {refreshNeeded: true});
+        },
+      );
 
       Toast.show({
         type: 'success',
         text1: 'Event updated successfully',
       });
-      navigation.goBack();
     } catch (error) {
       Toast.show({
         type: 'error',
@@ -243,6 +247,7 @@ const UpdatePost = () => {
                       accentColor="#B57EDC"
                       textColor="#B57EDC"
                       onChange={onChangeDate}
+                      minimumDate={new Date()}
                     />
                   </View>
                   {/* Picker for time  */}
@@ -263,6 +268,7 @@ const UpdatePost = () => {
                     <Text style={styles.label}>Title:</Text>
                     <TextInput
                       placeholder="Type of event/group name"
+                      maxLength={20}
                       value={title}
                       onChangeText={setTitle}
                       style={styles.input}
@@ -278,6 +284,7 @@ const UpdatePost = () => {
                     </View>
                     <TextInput
                       placeholder="Where to meet"
+                      maxLength={35}
                       value={location}
                       onChangeText={text => {
                         setLocation(text);
