@@ -33,6 +33,7 @@ import {faComment, faThumbsUp} from '@fortawesome/free-regular-svg-icons';
 import {faThumbsUp as faThumbsUpSolid} from '@fortawesome/free-solid-svg-icons';
 import Comments from '../Comments/Comments';
 import FastImage from 'react-native-fast-image';
+import {deletePhoto} from '../../api/storage';
 
 const ItemComponent = memo(
   ({
@@ -110,7 +111,18 @@ const ItemComponent = memo(
 
     const handleDelete = async () => {
       try {
+        //delete photos from storage
+        if (item.photo1) {
+          deletePhoto(item.photo1.path);
+        }
+        if (item.photo2) {
+          deletePhoto(item.photo2.path);
+        }
+        if (item.photo3) {
+          deletePhoto(item.photo3.path);
+        }
         await deletePostFromFirestore(item.id);
+
         onDelete(item.id); // Notify parent component to update the list
         setModalVisible(false);
         Toast.show({

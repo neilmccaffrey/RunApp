@@ -9,7 +9,6 @@ import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
 import React, {useState} from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -101,13 +100,11 @@ const Profile = ({navigation}) => {
             type: 'error',
             text1: `Camera error: ${response.errorCode}`,
           });
-          Alert.alert('Error', `Camera error: ${response.errorCode}`);
         } else if (response.errorMessage) {
           Toast.show({
             type: 'error',
             text1: `Error message: ${response.errorMessage}`,
           });
-          Alert.alert('Error', `Error message: ${response.errorMessage}`);
         } else if (response.assets && response.assets.length > 0) {
           const takenPhoto = response.assets[0];
           try {
@@ -119,7 +116,6 @@ const Profile = ({navigation}) => {
               type: 'error',
               text1: error.message,
             });
-            Alert.alert('Error', error.message);
           }
         }
       },
