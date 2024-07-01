@@ -362,6 +362,22 @@ export const updateNotificationTimes = async (eventTime, id) => {
   }
 };
 
+export const deleteNotifications = async id => {
+  try {
+    const eventSignupsRef = firestore().collection('event_signups');
+    const snapshot = await eventSignupsRef.where('postId', '==', id).get();
+
+    const batch = firestore().batch();
+
+    snapshot.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+  } catch (error) {
+    console.error('Error deleting notifications:', error);
+  }
+};
+
 /**
  * Fetch display names for all users in the isGoing list.
  * @param {Array} isGoingList - The list of attendees with user UIDs.

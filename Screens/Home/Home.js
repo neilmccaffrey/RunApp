@@ -33,6 +33,7 @@ const Home = ({navigation, route}) => {
 
   const [activeIndexes, setActiveIndexes] = useState({});
 
+  //convert firebase seconds and nanoseconds to JS milliseconds timestamp
   const convertTimestampToDate = timestamp => {
     if (
       timestamp &&
@@ -117,6 +118,40 @@ const Home = ({navigation, route}) => {
       fetchData();
     }
   }, [authenticating]);
+
+  // Real-time listener to update posts for everyone. (avoids deleted posts being interacted with)
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('posts')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(
+        async snapshot => {
+          if (!loading && !snapshot.empty) {
+            const documents = await Promise.all(
+              snapshot.docs.map(async doc => {
+                const postData = doc.data();
+                const attendeesWithDisplayNames =
+                  await fetchDisplayNamesForAttendees(postData.isGoing || []);
+                return {
+                  id: doc.id,
+                  ...postData,
+                  eventTime: convertTimestampToDate(postData.eventTime),
+                  isGoing: attendeesWithDisplayNames,
+                };
+              }),
+            );
+            setData(documents);
+          } else if (!loading) {
+            setData([]);
+          }
+        },
+        error => {
+          console.error('Error fetching real-time updates: ', error);
+        },
+      );
+
+    return () => unsubscribe();
+  }, [loading]);
 
   // Update data on return to Home screen. Ensures all post/profile updates are accurate
   useFocusEffect(
@@ -286,11 +321,13 @@ const Home = ({navigation, route}) => {
         windowSize={2}
         removeClippedSubviews={true} //only load what is in visible area of scrollview for performance
         ListEmptyComponent={
-          <View style={styles.emptyList}>
-            <Text style={styles.emptyListText}>
-              No new events are currently scheduled.
-            </Text>
-          </View>
+          !loading && ( //set !loading to not interfere with loading state and cause additional renders
+            <View style={styles.emptyList}>
+              <Text style={styles.emptyListText}>
+                No new events are currently scheduled.
+              </Text>
+            </View>
+          )
         }
       />
     </SafeAreaView>
@@ -298,44 +335,3 @@ const Home = ({navigation, route}) => {
 };
 
 export default Home;
-
-// const fetchData = async (lastDoc = null, reset = false) => {
-//   try {
-//     const query = firestore()
-//       .collection('posts')
-//       .orderBy('createdAt', 'desc')
-//       .limit(PAGE_SIZE);
-
-//     const snapshot = lastDoc
-//       ? await query.startAfter(lastDoc).get()
-//       : await query.get();
-//     const documents = await Promise.all(
-//       snapshot.docs.map(async doc => {
-//         const postData = doc.data();
-//         const attendeesWithDisplayNames = await fetchDisplayNamesForAttendees(
-//           postData.isGoing || [],
-//         );
-//         return {
-//           id: doc.id,
-//           ...postData,
-//           eventTime: convertTimestampToDate(postData.eventTime),
-//           isGoing: attendeesWithDisplayNames,
-//         };
-//       }),
-//     );
-
-//     if (documents.length < PAGE_SIZE) {
-//       setHasMore(false);
-//     }
-
-//     await preloadImages(documents);
-
-//     setData(prevData => (reset ? documents : [...prevData, ...documents]));
-//     setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
-//   } catch (error) {
-//     console.error(error.message);
-//   } finally {
-//     setLoading(false);
-//     setLoadingMore(false);
-//   }
-// };

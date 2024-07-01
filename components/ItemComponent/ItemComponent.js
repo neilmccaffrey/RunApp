@@ -14,6 +14,7 @@ import styles from './styles';
 import ShowMore from '../ShowMore/ShowMore';
 import Toast from 'react-native-toast-message';
 import {
+  deleteNotifications,
   deletePostFromFirestore,
   fetchDisplayName,
   updateAttendanceInFirestore,
@@ -121,7 +122,11 @@ const ItemComponent = memo(
         if (item.photo3) {
           deletePhoto(item.photo3.path);
         }
+        //delete post
         await deletePostFromFirestore(item.id);
+
+        //delete notification for all who signed up
+        await deleteNotifications(item.id);
 
         onDelete(item.id); // Notify parent component to update the list
         setModalVisible(false);
