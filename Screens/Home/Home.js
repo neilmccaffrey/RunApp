@@ -4,6 +4,7 @@ import {
   Dimensions,
   FlatList,
   SafeAreaView,
+  Text,
   View,
 } from 'react-native';
 import Header from '../../components/Header/Header';
@@ -284,6 +285,13 @@ const Home = ({navigation, route}) => {
         ListFooterComponent={renderFooter}
         windowSize={2}
         removeClippedSubviews={true} //only load what is in visible area of scrollview for performance
+        ListEmptyComponent={
+          <View style={styles.emptyList}>
+            <Text style={styles.emptyListText}>
+              No new events are currently scheduled.
+            </Text>
+          </View>
+        }
       />
     </SafeAreaView>
   );

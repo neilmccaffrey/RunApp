@@ -1,5 +1,9 @@
 import {Dimensions, StyleSheet} from 'react-native';
-import {horizontalScale, verticalScale} from '../../Styles/scaling';
+import {
+  horizontalScale,
+  scaleFontSize,
+  verticalScale,
+} from '../../Styles/scaling';
 const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
@@ -32,6 +36,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  emptyList: {
+    alignItems: 'center',
+    marginTop: verticalScale(50),
+    marginHorizontal: horizontalScale(10),
+  },
+  emptyListText: {
+    color: '#36454F',
+    fontSize: scaleFontSize(20),
   },
 });
 
