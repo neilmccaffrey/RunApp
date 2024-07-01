@@ -24,6 +24,7 @@ const Home = ({navigation, route}) => {
   const PAGE_SIZE = 5;
   const flatListRef = useRef(null);
   const {authenticating} = useAuth();
+  const postsSetRef = useRef(new Set()); //used to ensure no duplicates
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -73,7 +74,6 @@ const Home = ({navigation, route}) => {
         .collection('posts')
         .orderBy('createdAt', 'desc')
         .limit(PAGE_SIZE);
-
       const snapshot = lastDoc
         ? await query.startAfter(lastDoc).get()
         : await query.get();
@@ -98,7 +98,14 @@ const Home = ({navigation, route}) => {
 
       await preloadImages(documents);
 
-      setData(prevData => (reset ? documents : [...prevData, ...documents]));
+      //used Set to avoid very few casses where a duplicate post is added with real-time updates
+      if (reset) {
+        postsSetRef.current = new Set(documents);
+      } else {
+        documents.forEach(doc => postsSetRef.current.add(doc));
+      }
+
+      setData(Array.from(postsSetRef.current));
       setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
 
       // Scroll to top if reset
