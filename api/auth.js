@@ -43,9 +43,7 @@ export const passwordReset = async email => {
     // validate if email exists before sending password reset email
     const emailExists = await isEmailRegistered(email);
     if (!emailExists) {
-      const error = new Error(
-        'There is no user record corresponding to this email.',
-      );
+      const error = new Error();
       error.code = 'auth/user-not-found';
       throw error;
     }
@@ -64,6 +62,6 @@ export const isEmailRegistered = async email => {
       .get();
     return !userSnapshot.empty;
   } catch (error) {
-    throw error;
+    return false;
   }
 };

@@ -98,7 +98,7 @@ const Home = ({navigation, route}) => {
 
       await preloadImages(documents);
 
-      //used Set to avoid very few casses where a duplicate post is added with real-time updates
+      //used Set to avoid very few cases where a duplicate post is added with real-time updates
       if (reset) {
         postsSetRef.current = new Set(documents);
       } else {

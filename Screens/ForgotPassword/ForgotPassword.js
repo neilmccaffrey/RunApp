@@ -28,15 +28,16 @@ const ForgotPassword = ({navigation}) => {
 
   const handlePasswordReset = async () => {
     try {
-      await passwordReset(email);
+      const emailToLowerCase = email.toLowerCase();
+      await passwordReset(emailToLowerCase);
       // Reset the email state
       setEmail('');
 
-      //Navigate to Home screen and clear nav stack
+      //Navigate to login screen and clear nav stack
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{name: Routes.Home}],
+          routes: [{name: Routes.Login}],
         }),
       );
     } catch (error) {

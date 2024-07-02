@@ -124,7 +124,6 @@ export const AuthProvider = ({children}) => {
         setDisplayName(newDisplayName);
       }
     } catch (error) {
-      console.error('Error updating user profile:', error);
       Toast.show({
         type: 'error',
         text1: error.message,
