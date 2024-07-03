@@ -143,10 +143,18 @@ export const fetchComments = async postItemId => {
   try {
     const postRef = firestore().collection('posts').doc(postItemId);
     const postDoc = await postRef.get();
-    const postData = postDoc.data();
-    return postData.comments;
+    if (postDoc.exists) {
+      const postData = postDoc.data();
+      return postData.comments || []; // Return comments or an empty array if no comments
+    } else {
+      return [];
+    }
   } catch (error) {
-    console.error('Error fetching comments:', error);
+    Toast.show({
+      type: 'error',
+      text1: error.message,
+    });
+    return []; // Return an empty array in case of error
   }
 };
 

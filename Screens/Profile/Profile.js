@@ -72,7 +72,7 @@ const Profile = ({navigation}) => {
         } catch (error) {
           Toast.show({
             type: 'error',
-            text1: error,
+            text1: error.message,
           });
         } finally {
           setIsUploading(false); // Set uploading state to false after upload completes
