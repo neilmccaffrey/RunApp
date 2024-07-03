@@ -277,7 +277,7 @@ export const fetchDisplayName = async userUid => {
     const userDoc = await firestore().collection('users').doc(userUid).get();
     if (userDoc.exists) {
       const userData = userDoc.data();
-      return userData.displayName;
+      return userData.displayName || 'Anonymous';
     } else {
       return 'Anonymous';
     }
