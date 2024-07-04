@@ -8,14 +8,18 @@ import {
 } from 'react-native';
 import styles from './styles';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import {faCircleInfo, faPenToSquare} from '@fortawesome/free-solid-svg-icons';
+import {
+  faCircleInfo,
+  faPenToSquare,
+  faUnlock,
+} from '@fortawesome/free-solid-svg-icons';
 import {Routes} from '../../navigation/Routes';
 import {horizontalScale} from '../../Styles/scaling';
 import {useAuth} from '../../contexts/AuthProvider';
 import FastImage from 'react-native-fast-image';
 
 const Header = ({navigation}) => {
-  const {photoURL} = useAuth();
+  const {isAdmin, photoURL} = useAuth();
 
   return (
     <>
@@ -41,7 +45,6 @@ const Header = ({navigation}) => {
           )}
           <Text style={styles.text}>Profile</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
           style={styles.profile}
           onPress={() => navigation.navigate(Routes.Post)}>
@@ -60,6 +63,17 @@ const Header = ({navigation}) => {
           />
           <Text style={styles.text}>Info</Text>
         </TouchableOpacity>
+
+        {isAdmin && (
+          <TouchableOpacity onPress={() => navigation.navigate(Routes.Admin)}>
+            <FontAwesomeIcon
+              icon={faUnlock}
+              size={horizontalScale(50)}
+              color={'#B57EDC'}
+            />
+            <Text style={styles.text}>Admin</Text>
+          </TouchableOpacity>
+        )}
       </View>
       <View style={styles.showdowContainer} />
     </>

@@ -3,6 +3,7 @@ import auth from '@react-native-firebase/auth';
 import {
   addDisplayNameToUserDoc,
   addProfilePhotoUrlToUserDoc,
+  fetchAdminStatus,
   fetchInitialDisplayName,
   fetchProfilePhoto,
   removeProfilePhotoUrlFromUserDoc,
@@ -21,6 +22,7 @@ export const AuthProvider = ({children}) => {
   const [photoURL, setPhotoURL] = useState(null);
   const [initializing, setInitializing] = useState(true);
   const [authenticating, setAuthenticating] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Handle user state changes
   const onAuthStateChanged = async user => {
@@ -28,9 +30,11 @@ export const AuthProvider = ({children}) => {
       try {
         const initialName = await fetchInitialDisplayName(user);
         const initialPhoto = await fetchProfilePhoto(user);
+        const admin = await fetchAdminStatus(user);
         setUser(user);
         setDisplayName(initialName);
         setPhotoURL(initialPhoto);
+        setIsAdmin(admin);
         await AsyncStorage.setItem('user', JSON.stringify(user));
 
         // Preload and cache the profile photo
@@ -38,7 +42,6 @@ export const AuthProvider = ({children}) => {
           FastImage.preload([{uri: initialPhoto}]);
         }
       } catch (error) {
-        console.log(error.message);
         Toast.show({
           type: 'error',
           text1: error.message,
@@ -158,6 +161,7 @@ export const AuthProvider = ({children}) => {
         setUser,
         setDisplayName,
         setPhotoURL,
+        isAdmin,
       }}>
       {children}
     </AuthContext.Provider>

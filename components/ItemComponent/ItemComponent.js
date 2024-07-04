@@ -299,7 +299,10 @@ const ItemComponent = memo(
                 size={14}
               />
               <Text style={styles.commentText}>
-                Comments {item.comments > 0 && item.comments.length}
+                Comments{' '}
+                {item.comments &&
+                  item.comments.length > 0 &&
+                  item.comments.length}
               </Text>
             </View>
           </TouchableOpacity>

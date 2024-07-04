@@ -12,6 +12,7 @@ import UpdatePost from '../Screens/UpdatePost/UpdatePost';
 import {ActivityIndicator, View} from 'react-native';
 import Info from '../Screens/Info/Info';
 import styles from './styles';
+import Admin from '../Screens/Admin/Admin';
 
 const Stack = createStackNavigator();
 
@@ -49,6 +50,7 @@ const MainNavigation = () => {
       <Stack.Screen name={Routes.UpdatePost} component={UpdatePost} />
       <Stack.Screen name={Routes.Profile} component={Profile} />
       <Stack.Screen name={Routes.Info} component={Info} />
+      <Stack.Screen name={Routes.Admin} component={Admin} />
     </Stack.Navigator>
   );
 };

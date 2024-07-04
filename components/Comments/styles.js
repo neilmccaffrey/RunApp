@@ -120,6 +120,17 @@ const styles = StyleSheet.create({
   textColor: {
     color: 'white',
   },
+  backLeftButton: {
+    alignItems: 'center',
+    bottom: 0,
+    justifyContent: 'center',
+    position: 'absolute',
+    top: 0,
+    width: 75,
+    backgroundColor: 'gray',
+    right: 77,
+    marginBottom: verticalScale(16),
+  },
 });
 
 export default styles;

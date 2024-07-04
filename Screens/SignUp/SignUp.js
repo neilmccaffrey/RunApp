@@ -29,7 +29,10 @@ const SignUp = ({navigation}) => {
 
   const handleSignUp = async () => {
     try {
-      await signUpWithEmailAndPassword(email, password);
+      // Trim spaces from the email input
+      const trimmedEmail = email.trim();
+      await signUpWithEmailAndPassword(trimmedEmail, password);
+
       // Toast for successful account creation
       Toast.show({
         type: 'success',

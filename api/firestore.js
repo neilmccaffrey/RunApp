@@ -405,3 +405,16 @@ export const fetchDisplayNamesForAttendees = async isGoingList => {
     throw error;
   }
 };
+
+//fetch users initial display name
+export const fetchAdminStatus = async user => {
+  try {
+    const userDoc = await firestore().collection('users').doc(user.uid).get();
+    if (userDoc.exists) {
+      const userData = userDoc.data();
+      return userData.isAdmin;
+    }
+  } catch (error) {
+    throw error;
+  }
+};

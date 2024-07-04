@@ -2,6 +2,7 @@ import React, {memo, useEffect, useRef, useState} from 'react';
 import {
   faCircleArrowUp,
   faTrashCan,
+  faTriangleExclamation,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -136,6 +137,10 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
           }}>
           <FontAwesomeIcon icon={faTrashCan} color={'white'} size={20} />
           <Text style={styles.textColor}>Delete</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.backLeftButton}>
+          <FontAwesomeIcon icon={faTriangleExclamation} size={20} />
+          <Text style={styles.textColor}>Report</Text>
         </TouchableOpacity>
       </View>
     );

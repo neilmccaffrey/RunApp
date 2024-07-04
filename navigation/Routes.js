@@ -7,4 +7,5 @@ export const Routes = {
   Profile: 'Profile',
   UpdatePost: 'UpdatePost',
   Info: 'Info',
+  Admin: 'Admin',
 };
