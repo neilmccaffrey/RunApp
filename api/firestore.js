@@ -418,3 +418,56 @@ export const fetchAdminStatus = async user => {
     throw error;
   }
 };
+
+//report comment
+export const reportComment = async (postId, commentId, userId, reporterId) => {
+  try {
+    const postRef = firestore().collection('posts').doc(postId);
+    const postDoc = await postRef.get();
+    const postData = postDoc.data();
+
+    // Find the comment with the matching commentId
+    const comment = postData.comments.find(
+      comment => comment.commentId === commentId,
+    );
+
+    // Add the comment to the reportedComments collection
+    await firestore().collection('reportedComments').add({
+      postId,
+      comment,
+      userId,
+      reportedBy: reporterId,
+      reportedAt: firestore.FieldValue.serverTimestamp(),
+    });
+
+    const updatedComments = postData.comments.filter(
+      comment => comment.commentId !== commentId,
+    );
+
+    // Update the post document with the updated comments array
+    await postRef.update({comments: updatedComments});
+  } catch (error) {
+    throw error;
+  }
+};
+
+//ban a user
+export const banUser = async userId => {
+  try {
+    await firestore().collection('users').doc(userId).update({
+      isBanned: true,
+    });
+  } catch (error) {
+    console.error('Error banning user:', error);
+  }
+};
+
+//delete reported comment
+export const deleteReportedComment = async docId => {
+  try {
+    const postRef = firestore().collection('reportedComments').doc(docId);
+    await postRef.delete();
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+};

@@ -27,6 +27,7 @@ import {
   addCommentToPost,
   deleteComment,
   fetchComments,
+  reportComment,
 } from '../../api/firestore';
 import {useAuth} from '../../contexts/AuthProvider';
 import uuid from 'react-native-uuid';
@@ -115,7 +116,7 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
             }
             try {
               await deleteComment(postItem.id, renData.item.commentId);
-              const updatedComments = await fetchComments(postItem.id); // Refresh comments after adding a new comment
+              const updatedComments = await fetchComments(postItem.id); // Refresh comments after deleting comment
               setComments(updatedComments);
 
               // Preload updated comment images
@@ -138,7 +139,36 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
           <FontAwesomeIcon icon={faTrashCan} color={'white'} size={20} />
           <Text style={styles.textColor}>Delete</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.backLeftButton}>
+        <TouchableOpacity
+          style={styles.backLeftButton}
+          onPress={async () => {
+            try {
+              await reportComment(
+                postItem.id,
+                renData.item.commentId,
+                renData.item.userId,
+                user.uid,
+              );
+              const updatedComments = await fetchComments(postItem.id); // Refresh comments after reporting comment
+              setComments(updatedComments);
+
+              // Preload updated comment images
+              const uris = updatedComments.map(comment => ({
+                uri: comment.photoURL,
+              }));
+              FastImage.preload(uris);
+
+              Toast.show({
+                type: 'success',
+                text1: 'Comment reported',
+              });
+            } catch (error) {
+              Toast.show({
+                type: 'error',
+                text1: error.message,
+              });
+            }
+          }}>
           <FontAwesomeIcon icon={faTriangleExclamation} size={20} />
           <Text style={styles.textColor}>Report</Text>
         </TouchableOpacity>
