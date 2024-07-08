@@ -467,6 +467,12 @@ export const reportPost = async (postId, reporterId) => {
         reportedAt: firestore.FieldValue.serverTimestamp(),
         ...postData, // Spread the postData to include all its fields
       });
+
+    Toast.show({
+      type: 'success',
+      text1: 'Post Reported',
+      text2: 'Post will be reviewed and necessary action taken',
+    });
   } catch (error) {
     console.log(error.message);
   }

@@ -429,7 +429,10 @@ const ItemComponent = memo(
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.modalOptions}
-                  onPress={() => reportPost(item.id, user.uid)}>
+                  onPress={() => {
+                    reportPost(item.id, user.uid);
+                    setReportModalVisible(false);
+                  }}>
                   <FontAwesomeIcon
                     icon={faTriangleExclamation}
                     size={30}
