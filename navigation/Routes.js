@@ -8,4 +8,5 @@ export const Routes = {
   UpdatePost: 'UpdatePost',
   Info: 'Info',
   Admin: 'Admin',
+  UserBanned: 'UserBanned',
 };

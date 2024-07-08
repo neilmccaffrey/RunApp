@@ -21,6 +21,8 @@ import {
   GestureHandlerRootView,
   PanGestureHandler,
 } from 'react-native-gesture-handler';
+import {isBanned} from '../../api/firestore';
+import auth from '@react-native-firebase/auth';
 
 const Login = ({navigation}) => {
   const [email, setEmail] = useState('');
@@ -36,13 +38,27 @@ const Login = ({navigation}) => {
       setEmail('');
       setPassword('');
 
-      // Reset the navigation stack and navigate to Home screen
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{name: Routes.Home}],
-        }),
-      );
+      // Fetch the user from Firebase Auth
+      const user = auth().currentUser;
+      // check if user isBanned and route to banned page if so
+      const banned = await isBanned(user.uid);
+
+      if (banned) {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{name: Routes.UserBanned}],
+          }),
+        );
+      } else {
+        // Reset the navigation stack and navigate to Home screen
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{name: Routes.Home}],
+          }),
+        );
+      }
     } catch (error) {
       console.log(error.message);
       Toast.show({

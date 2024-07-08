@@ -13,6 +13,8 @@ import {ActivityIndicator, View} from 'react-native';
 import Info from '../Screens/Info/Info';
 import styles from './styles';
 import Admin from '../Screens/Admin/Admin';
+import UserBanned from '../Screens/UserBanned/UserBanned';
+import {isBanned} from '../api/firestore';
 
 const Stack = createStackNavigator();
 
@@ -21,13 +23,23 @@ const MainNavigation = () => {
   const [initialRoute, setInitialRoute] = useState(null);
 
   useEffect(() => {
-    if (!initializing) {
-      // Only update the initial route if it hasn't been set yet
-      if (initialRoute === null) {
-        setInitialRoute(user ? Routes.Home : Routes.Login);
+    const checkUserStatus = async () => {
+      if (user) {
+        const banned = await isBanned(user.uid);
+        if (banned) {
+          setInitialRoute(Routes.UserBanned);
+        } else {
+          setInitialRoute(Routes.Home);
+        }
+      } else {
+        setInitialRoute(Routes.Login);
       }
+    };
+
+    if (!initializing) {
+      checkUserStatus();
     }
-  }, [user, initializing, initialRoute]);
+  }, [user, initializing]);
 
   if (initializing || !initialRoute) {
     // Render a loading indicator while determining initial route
@@ -51,6 +63,7 @@ const MainNavigation = () => {
       <Stack.Screen name={Routes.Profile} component={Profile} />
       <Stack.Screen name={Routes.Info} component={Info} />
       <Stack.Screen name={Routes.Admin} component={Admin} />
+      <Stack.Screen name={Routes.UserBanned} component={UserBanned} />
     </Stack.Navigator>
   );
 };

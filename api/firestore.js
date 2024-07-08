@@ -471,3 +471,21 @@ export const deleteReportedComment = async docId => {
     console.error('Error deleting document:', error);
   }
 };
+
+// check users banned status
+export const isBanned = async userId => {
+  try {
+    // Fetch the user document from Firestore
+    const userDoc = await firestore().collection('users').doc(userId).get();
+
+    // Check if the user is banned
+    if (userDoc.exists && userDoc.data().isBanned) {
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Error checking banned status:', error);
+    return false;
+  }
+};
