@@ -32,7 +32,7 @@ export const createPost = async (
         photo2: photo2 || null,
         photo3: photo3 || null,
         createdAt: firestore.FieldValue.serverTimestamp(),
-        profilePhoto: photoURL,
+        profilePhoto: photoURL || null,
         userId: user.uid,
       });
 
@@ -105,7 +105,7 @@ export const updatePostInFirestore = async (
         photo1: photo1 || null,
         photo2: photo2 || null,
         photo3: photo3 || null,
-        profilePhoto: photoURL,
+        profilePhoto: photoURL || null,
         createdAt: firestore.FieldValue.serverTimestamp(),
         userId: user.uid,
       });
@@ -451,6 +451,27 @@ export const reportComment = async (postId, commentId, userId, reporterId) => {
   }
 };
 
+//report post
+export const reportPost = async (postId, reporterId) => {
+  try {
+    const postRef = firestore().collection('posts').doc(postId);
+    const postDoc = await postRef.get();
+    const postData = postDoc.data();
+
+    // Add the post to the reportedPosts collection
+    await firestore()
+      .collection('reportedPosts')
+      .add({
+        postId,
+        reportedBy: reporterId,
+        reportedAt: firestore.FieldValue.serverTimestamp(),
+        ...postData, // Spread the postData to include all its fields
+      });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+
 //ban a user
 export const banUser = async userId => {
   try {
@@ -466,6 +487,16 @@ export const banUser = async userId => {
 export const deleteReportedComment = async docId => {
   try {
     const postRef = firestore().collection('reportedComments').doc(docId);
+    await postRef.delete();
+  } catch (error) {
+    console.error('Error deleting document:', error);
+  }
+};
+
+//delete reported post
+export const deleteReportedPost = async docId => {
+  try {
+    const postRef = firestore().collection('reportedPosts').doc(docId);
     await postRef.delete();
   } catch (error) {
     console.error('Error deleting document:', error);

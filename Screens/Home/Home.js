@@ -317,6 +317,7 @@ const Home = ({navigation, route}) => {
         </View>
       )}
       <FlatList
+        showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps={'handled'}
         ref={flatListRef}
         data={data}

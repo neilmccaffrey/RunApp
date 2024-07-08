@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {
   FlatList,
+  Image,
   Modal,
   SafeAreaView,
   Text,
@@ -17,13 +18,22 @@ import {
   faTrashCan,
   faUserSlash,
 } from '@fortawesome/free-solid-svg-icons';
-import {banUser, deleteReportedComment} from '../../api/firestore';
+import {
+  banUser,
+  deletePostFromFirestore,
+  deleteReportedComment,
+  deleteReportedPost,
+} from '../../api/firestore';
+import {deletePhoto} from '../../api/storage';
 
 const Admin = () => {
   const [reportedComments, setReportedComments] = useState([]);
+  const [reportedPosts, setReportedPosts] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [postModal, setPostModal] = useState(false);
   const [userToBan, setUserToBan] = useState(null);
   const [docId, setDocId] = useState(null);
+  const [postItem, setPostItem] = useState(null);
 
   useEffect(() => {
     const fetchReportedComments = async () => {
@@ -41,7 +51,23 @@ const Admin = () => {
       }
     };
 
+    const fetchReportedPosts = async () => {
+      try {
+        const postsSnapshot = await firestore()
+          .collection('reportedPosts')
+          .get();
+        const postsList = postsSnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setReportedPosts(postsList);
+      } catch (error) {
+        console.log('Error fetching posts', error);
+      }
+    };
+
     fetchReportedComments();
+    fetchReportedPosts();
   }, []);
 
   const handleBanUser = async userId => {
@@ -69,16 +95,55 @@ const Admin = () => {
     }
   };
 
+  const handleDeletePost = async item => {
+    try {
+      //delete photos from storage
+      if (item.photo1) {
+        deletePhoto(item.photo1.path);
+      }
+      if (item.photo2) {
+        deletePhoto(item.photo2.path);
+      }
+      if (item.photo3) {
+        deletePhoto(item.photo3.path);
+      }
+      await deletePostFromFirestore(item.postId);
+      await deleteReportedPost(docId);
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setDocId(null);
+      setPostItem(null);
+      setPostModal(false);
+    }
+  };
+
+  const handleRemoveReport = async () => {
+    try {
+      await deleteReportedPost(docId);
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setDocId(null);
+      setPostItem(null);
+      setPostModal(false);
+    }
+  };
+
   return (
     <SafeAreaView style={[globalStyle.backgroundWhite, globalStyle.flex]}>
-      <View style={styles.commentContainer}>
+      <View style={styles.container}>
         <Text>Reported Comments:</Text>
         <FlatList
+          showsVerticalScrollIndicator={false}
           data={reportedComments}
           renderItem={({item}) => (
             <View style={styles.comment}>
-              <Text>{item.comment.text}</Text>
+              <View style={styles.textContainer}>
+                <Text>{item.comment.text}</Text>
+              </View>
               <TouchableOpacity
+                style={styles.ellipsisContainer}
                 onPress={() => {
                   setUserToBan(item.userId);
                   setDocId(item.id);
@@ -90,9 +155,54 @@ const Admin = () => {
           )}
           keyExtractor={item => item.id} // Ensure a unique key
         />
+
+        <Text>Reported Posts:</Text>
+        <FlatList
+          showsVerticalScrollIndicator={false}
+          data={reportedPosts}
+          renderItem={({item}) => (
+            <View style={styles.comment}>
+              <View style={styles.textContainer}>
+                <Text>Title: {item.title}</Text>
+                <Text>Location: {item.location}</Text>
+                <Text>Details: {item.details}</Text>
+                {item.photo1 && (
+                  <Image
+                    source={{uri: item.photo1.url}}
+                    style={styles.photos}
+                  />
+                )}
+                {item.photo2 && (
+                  <Image
+                    source={{uri: item.photo2.url}}
+                    style={styles.photos}
+                  />
+                )}
+                {item.photo3 && (
+                  <Image
+                    source={{uri: item.photo3.url}}
+                    style={styles.photos}
+                  />
+                )}
+              </View>
+
+              <TouchableOpacity
+                style={styles.ellipsisContainer}
+                onPress={() => {
+                  setUserToBan(item.userId);
+                  setPostItem(item);
+                  setDocId(item.id);
+                  setPostModal(true);
+                }}>
+                <FontAwesomeIcon icon={faEllipsis} size={20} />
+              </TouchableOpacity>
+            </View>
+          )}
+          keyExtractor={item => item.id} // Ensure a unique key
+        />
       </View>
 
-      {/* Ban user modal */}
+      {/* comment modal */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -119,6 +229,44 @@ const Admin = () => {
                 onPress={handleDeleteComment}>
                 <FontAwesomeIcon icon={faTrashCan} size={30} color={'red'} />
                 <Text style={styles.modalOptionsText}>Delete comment</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* post modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={postModal}
+        onRequestClose={() => {
+          setPostModal(false);
+        }}>
+        <TouchableWithoutFeedback onPress={() => setPostModal(false)}>
+          <View style={styles.overlay}>
+            <View style={styles.modalView}>
+              <TouchableOpacity
+                style={styles.modalOptions}
+                onPress={() => handleBanUser(userToBan)}>
+                <FontAwesomeIcon
+                  icon={faUserSlash}
+                  size={30}
+                  color={'#B57EDC'}
+                />
+                <Text style={styles.modalOptionsText}>BAN USER</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalOptions}
+                onPress={() => handleDeletePost(postItem)}>
+                <FontAwesomeIcon icon={faTrashCan} size={30} color={'red'} />
+                <Text style={styles.modalOptionsText}>Delete Post</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.modalOptions}
+                onPress={handleRemoveReport}>
+                <Text style={styles.modalOptionsText}>Remove Report</Text>
               </TouchableOpacity>
             </View>
           </View>

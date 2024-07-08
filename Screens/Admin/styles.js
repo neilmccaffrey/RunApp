@@ -6,9 +6,10 @@ import {
 } from '../../Styles/scaling';
 
 const styles = StyleSheet.create({
-  commentContainer: {
+  container: {
     marginTop: verticalScale(20),
     marginHorizontal: horizontalScale(15),
+    flex: 1,
   },
   comment: {
     flexDirection: 'row',
@@ -46,6 +47,16 @@ const styles = StyleSheet.create({
     marginLeft: horizontalScale(10),
     fontSize: scaleFontSize(20),
     color: '#36454F',
+  },
+  textContainer: {
+    flex: 1, // Take up remaining space
+  },
+  ellipsisContainer: {
+    marginLeft: horizontalScale(10), // Add some space between text and ellipsis
+  },
+  photos: {
+    height: verticalScale(200),
+    width: horizontalScale(200),
   },
 });
 

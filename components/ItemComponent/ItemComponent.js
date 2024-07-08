@@ -17,6 +17,7 @@ import {
   deleteNotifications,
   deletePostFromFirestore,
   fetchDisplayName,
+  reportPost,
   updateAttendanceInFirestore,
 } from '../../api/firestore';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -24,6 +25,7 @@ import {
   faEllipsis,
   faPenToSquare,
   faTrashCan,
+  faTriangleExclamation,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import {useAuth} from '../../contexts/AuthProvider';
@@ -53,6 +55,7 @@ const ItemComponent = memo(
     const [displayName, setDisplayName] = useState('');
     const [usersPost, setUsersPost] = useState(false);
     const [attendanceButton, setAttendanceButton] = useState(false);
+    const [reportModalVisible, setReportModalVisible] = useState(false);
 
     // open/close comment modal logic
     const [commentModal, setCommentModal] = useState(false);
@@ -215,8 +218,16 @@ const ItemComponent = memo(
             )}
             <Text style={styles.displayNameText}>{displayName}</Text>
           </View>
-          {usersPost && (
+          {usersPost ? (
             <TouchableOpacity onPress={() => setModalVisible(true)}>
+              <FontAwesomeIcon
+                icon={faEllipsis}
+                size={25}
+                style={styles.ellipsis}
+              />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity onPress={() => setReportModalVisible(true)}>
               <FontAwesomeIcon
                 icon={faEllipsis}
                 size={25}
@@ -326,11 +337,15 @@ const ItemComponent = memo(
           <TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
             <View style={styles.overlay}>
               <View style={styles.modalView}>
-                <FontAwesomeIcon
-                  icon={faXmark}
-                  size={30}
-                  style={styles.xButton}
-                />
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  style={styles.xButtonContainer}>
+                  <FontAwesomeIcon
+                    icon={faXmark}
+                    size={30}
+                    style={styles.xButton}
+                  />
+                </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.modalOptions}
                   onPress={() => handleEdit(item)}>
@@ -389,6 +404,42 @@ const ItemComponent = memo(
               />
             </View>
           </View>
+        </Modal>
+
+        {/* report modal */}
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={reportModalVisible}
+          onRequestClose={() => {
+            setReportModalVisible(false);
+          }}>
+          <TouchableWithoutFeedback
+            onPress={() => setReportModalVisible(false)}>
+            <View style={styles.overlay}>
+              <View style={styles.modalView}>
+                <TouchableOpacity
+                  onPress={() => setReportModalVisible(false)}
+                  style={styles.xButtonContainer}>
+                  <FontAwesomeIcon
+                    icon={faXmark}
+                    size={30}
+                    style={styles.xButton}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.modalOptions}
+                  onPress={() => reportPost(item.id, user.uid)}>
+                  <FontAwesomeIcon
+                    icon={faTriangleExclamation}
+                    size={30}
+                    color={'red'}
+                  />
+                  <Text style={styles.modalOptionsText}>Report Post</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
         </Modal>
       </View>
     );
