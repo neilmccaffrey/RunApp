@@ -11,6 +11,7 @@ import {
 import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FastImage from 'react-native-fast-image';
+import {deleteProfilePhotoFromStorage} from '../api/storage';
 
 // Create AuthContext
 export const AuthContext = createContext();
@@ -140,6 +141,7 @@ export const AuthProvider = ({children}) => {
       const currentUser = auth().currentUser;
       if (currentUser) {
         await removeProfilePhotoUrlFromUserDoc(currentUser);
+        await deleteProfilePhotoFromStorage(photoURL);
         setPhotoURL(null);
       }
     } catch (error) {

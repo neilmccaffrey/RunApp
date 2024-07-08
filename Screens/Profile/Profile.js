@@ -1,3 +1,4 @@
+import React, {useState} from 'react';
 import {
   faCamera,
   faChevronLeft,
@@ -6,7 +7,6 @@ import {
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
-import React, {useState} from 'react';
 import {
   ActivityIndicator,
   Keyboard,
