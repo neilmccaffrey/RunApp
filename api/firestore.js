@@ -458,6 +458,22 @@ export const reportPost = async (postId, reporterId) => {
     const postDoc = await postRef.get();
     const postData = postDoc.data();
 
+    // Check if the post is already reported
+    const reportedPostsRef = firestore().collection('reportedPosts');
+    const querySnapshot = await reportedPostsRef
+      .where('postId', '==', postId)
+      .get();
+
+    if (!querySnapshot.empty) {
+      // Post already reported
+      Toast.show({
+        type: 'success',
+        text1: 'Post Reported',
+        text2: 'Post will be reviewed and necessary action taken',
+      });
+      return;
+    }
+
     // Add the post to the reportedPosts collection
     await firestore()
       .collection('reportedPosts')
