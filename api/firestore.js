@@ -561,3 +561,14 @@ export const blockUser = async (blockedId, blockerId) => {
     console.log(error.message);
   }
 };
+
+//fetch blocked list
+export const fetchBlockedUsers = async userId => {
+  try {
+    const userDoc = await firestore().collection('users').doc(userId).get();
+    return userDoc.exists ? userDoc.data().blocked || [] : [];
+  } catch (error) {
+    console.log('Error fetching blocked users:', error);
+    return [];
+  }
+};

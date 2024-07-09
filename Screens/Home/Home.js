@@ -13,17 +13,24 @@ import firestore from '@react-native-firebase/firestore';
 import styles from './styles';
 import {horizontalScale} from '../../Styles/scaling';
 import ItemComponent from '../../components/ItemComponent/ItemComponent';
-import {fetchDisplayNamesForAttendees} from '../../api/firestore';
+import {
+  fetchBlockedUsers,
+  fetchDisplayNamesForAttendees,
+} from '../../api/firestore';
 import FastImage from 'react-native-fast-image';
 import {useFocusEffect} from '@react-navigation/native';
 import {useAuth} from '../../contexts/AuthProvider';
 
 const {width} = Dimensions.get('window');
 
+const filterPosts = (posts, blockedUsers) => {
+  return posts.filter(post => !blockedUsers.includes(post.userId));
+};
+
 const Home = ({navigation, route}) => {
   const PAGE_SIZE = 5;
   const flatListRef = useRef(null);
-  const {authenticating} = useAuth();
+  const {user, authenticating} = useAuth();
   const postsSetRef = useRef(new Set()); //used to ensure no duplicates
 
   const [data, setData] = useState([]);
@@ -70,6 +77,7 @@ const Home = ({navigation, route}) => {
 
   const fetchData = async (lastDoc = null, reset = false) => {
     try {
+      const blockedUsers = await fetchBlockedUsers(user.uid);
       const query = firestore()
         .collection('posts')
         .orderBy('createdAt', 'desc')
@@ -92,17 +100,20 @@ const Home = ({navigation, route}) => {
         }),
       );
 
-      if (documents.length < PAGE_SIZE) {
+      // Filter out posts from blocked users
+      const filteredDocuments = filterPosts(documents, blockedUsers);
+
+      if (filteredDocuments.length < PAGE_SIZE) {
         setHasMore(false);
       }
 
-      await preloadImages(documents);
+      await preloadImages(filteredDocuments);
 
       //used Set to avoid very few cases where a duplicate post is added with real-time updates
       if (reset) {
-        postsSetRef.current = new Set(documents);
+        postsSetRef.current = new Set(filteredDocuments);
       } else {
-        documents.forEach(doc => postsSetRef.current.add(doc));
+        filteredDocuments.forEach(doc => postsSetRef.current.add(doc));
       }
 
       setData(Array.from(postsSetRef.current));
@@ -134,6 +145,7 @@ const Home = ({navigation, route}) => {
       .onSnapshot(
         async snapshot => {
           if (!loading && !snapshot.empty) {
+            const blockedUsers = await fetchBlockedUsers(user.uid);
             const documents = await Promise.all(
               snapshot.docs.map(async doc => {
                 const postData = doc.data();
@@ -147,7 +159,9 @@ const Home = ({navigation, route}) => {
                 };
               }),
             );
-            setData(documents);
+            // Filter out posts from blocked users
+            const filteredDocuments = filterPosts(documents, blockedUsers);
+            setData(filteredDocuments);
           } else if (!loading) {
             setData([]);
           }

@@ -29,6 +29,7 @@ import {
   addCommentToPost,
   blockUser,
   deleteComment,
+  fetchBlockedUsers,
   fetchComments,
   reportComment,
 } from '../../api/firestore';
@@ -36,6 +37,18 @@ import {useAuth} from '../../contexts/AuthProvider';
 import uuid from 'react-native-uuid';
 import globalStyle from '../../Styles/globalStyle';
 import FastImage from 'react-native-fast-image';
+
+// Fetch blocked users and filter comments
+const loadAndFilterComments = async (postId, userId) => {
+  const blockedUsers = await fetchBlockedUsers(userId);
+  const comments = await fetchComments(postId);
+  return filterComments(comments, blockedUsers);
+};
+
+// Filter comments based on blocked users
+const filterComments = (comments, blockedUsers) => {
+  return comments.filter(comment => !blockedUsers.includes(comment.userId));
+};
 
 const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
   const {user, displayName, photoURL} = useAuth();
@@ -49,7 +62,11 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
   useEffect(() => {
     const loadComments = async () => {
       if (postItem.id) {
-        const fetchedComments = await fetchComments(postItem.id);
+        //fetch filtered comments
+        const fetchedComments = await loadAndFilterComments(
+          postItem.id,
+          user.uid,
+        );
         setComments(fetchedComments);
         // Preload comment images if fetched comments exists and is greater than 0
         if (fetchComments && fetchedComments?.length > 0) {
@@ -77,7 +94,7 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
       userId: user.uid,
       displayName: displayName || 'Anonymous',
       photoURL: photoURL || '',
-      text: newComment,
+      text: newComment.trim(),
       createdAt: firestore.Timestamp.now(), // Create the timestamp explicitly
       commentId: uuid.v4(),
     };
@@ -85,7 +102,10 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
     try {
       await addCommentToPost(postItem.id, comment);
       setNewComment('');
-      const updatedComments = await fetchComments(postItem.id); // Refresh comments after adding a new comment
+      const updatedComments = await loadAndFilterComments(
+        postItem.id,
+        user.uid,
+      ); // Refresh comments after adding a new comment
       setComments(updatedComments);
       // Preload the new comment image
       if (comment.photoURL) {
@@ -120,7 +140,10 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
             }
             try {
               await deleteComment(postItem.id, renData.item.commentId);
-              const updatedComments = await fetchComments(postItem.id); // Refresh comments after deleting comment
+              const updatedComments = await loadAndFilterComments(
+                postItem.id,
+                user.uid,
+              ); // Refresh comments after deleting comment
               setComments(updatedComments);
 
               // Preload updated comment images
@@ -186,6 +209,11 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
                 text: 'OK',
                 onPress: async () => {
                   await blockUser(renData.item.userId, user.uid);
+                  const updatedComments = await loadAndFilterComments(
+                    postItem.id,
+                    user.uid,
+                  ); //refresh comments after blocking a user
+                  setComments(updatedComments);
                   Toast.show({
                     type: 'success',
                     text1: 'User Blocked',
