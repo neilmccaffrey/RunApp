@@ -419,7 +419,11 @@ const UpdatePost = ({navigation}) => {
                     title={'Update'}
                     onPress={() => {
                       const combinedEventTime = combineDateAndTime(date, time);
-                      handleUpdate(combinedEventTime);
+                      //disable button on press to prevent spam posting the same post (reusing isUploading)
+                      setIsUploading(true);
+                      setTimeout(() => {
+                        handleUpdate(combinedEventTime);
+                      }, 1000); // Delay of 1 second for google vision
                     }}
                     isDisabled={isUploading}
                   />

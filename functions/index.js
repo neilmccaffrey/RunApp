@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
+const vision = require('@google-cloud/vision');
 const moment = require('moment-timezone');
 
 admin.initializeApp();
@@ -59,3 +60,41 @@ async function sendNotification(deviceToken, message) {
       console.log('Error sending message:', error);
     });
 }
+
+const client = new vision.ImageAnnotatorClient({
+  keyFilename: 'run401-fe9b3-fce98b8bf623.json', //path to JSON file
+});
+
+exports.moderateImage = functions.storage.object().onFinalize(async object => {
+  const filePath = object.name;
+  const file = admin.storage().bucket().file(filePath);
+
+  try {
+    const [result] = await client.safeSearchDetection(
+      `gs://${object.bucket}/${filePath}`,
+    );
+    const detections = result.safeSearchAnnotation;
+
+    const {adult, violence, racy} = detections;
+
+    if (
+      adult === 'VERY_LIKELY' ||
+      violence === 'VERY_LIKELY' ||
+      racy === 'VERY_LIKELY'
+    ) {
+      await file.delete();
+
+      // Extract the user ID from the file path
+      const userId = filePath.split('/')[1].split('.')[0];
+
+      if (userId) {
+        // Update the user's Firestore document
+        await admin.firestore().collection('users').doc(userId).update({
+          profilePhoto: null,
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error during SafeSearchDetection:', error);
+  }
+});

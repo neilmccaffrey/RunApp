@@ -12,6 +12,7 @@ import Toast from 'react-native-toast-message';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import FastImage from 'react-native-fast-image';
 import {deleteProfilePhotoFromStorage} from '../api/storage';
+import firestore from '@react-native-firebase/firestore';
 
 // Create AuthContext
 export const AuthContext = createContext();
@@ -63,8 +64,30 @@ export const AuthProvider = ({children}) => {
   // Listen for authentication state changes
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged(onAuthStateChanged);
-    return unsubscribe; // Cleanup subscription on unmount
+    return () => unsubscribe(); // Cleanup subscription on unmount
   }, []);
+
+  // Firestore listener for profile photo updates  - necessary to prevent explicit images from being posted
+  useEffect(() => {
+    let unsubscribeFirestore;
+    if (user) {
+      unsubscribeFirestore = firestore()
+        .collection('users')
+        .doc(user.uid)
+        .onSnapshot(doc => {
+          const data = doc.data();
+          if (data && data.profilePhoto !== photoURL) {
+            setPhotoURL(data.profilePhoto || null);
+          }
+        });
+    }
+
+    return () => {
+      if (unsubscribeFirestore) {
+        unsubscribeFirestore();
+      }
+    };
+  }, [user, photoURL]);
 
   // Load user data from AsyncStorage on app launch
   useEffect(() => {
