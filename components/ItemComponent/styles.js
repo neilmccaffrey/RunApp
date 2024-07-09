@@ -8,11 +8,15 @@ const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   pictures: {
-    height: verticalScale(240),
+    height: '100%',
+    width: '100%',
+  },
+  imageContainer: {
+    maxHeight: verticalScale(240),
     width: width - horizontalScale(10),
     marginHorizontal: horizontalScale(5),
-    borderRadius: 10,
     marginTop: verticalScale(10),
+    overflow: 'hidden',
   },
   itemsContainer: {
     marginTop: verticalScale(10),

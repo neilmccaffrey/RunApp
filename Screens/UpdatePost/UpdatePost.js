@@ -1,4 +1,4 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
+import {useRoute} from '@react-navigation/native';
 import React, {useState} from 'react';
 import Toast from 'react-native-toast-message';
 import {deletePhoto, uploadPhoto} from '../../api/storage';
@@ -159,31 +159,35 @@ const UpdatePost = ({navigation}) => {
 
   const handleUpdate = async eventTime => {
     try {
-      await updatePostInFirestore(
-        {
-          id,
-          title,
-          location,
-          details,
-          eventTime,
-          photo1: photo1,
-          photo2: photo2,
-          photo3: photo3,
-          photoURL,
-          user,
-        },
-        async () => {
-          // Update notification times for all users signed up for this event and ensure it is called before navigating away
-          await updateNotificationTimes(eventTime, id);
+      if (!location) {
+        setNoLocation(true);
+      } else {
+        await updatePostInFirestore(
+          {
+            id,
+            title,
+            location,
+            details,
+            eventTime,
+            photo1: photo1,
+            photo2: photo2,
+            photo3: photo3,
+            photoURL,
+            user,
+          },
+          async () => {
+            // Update notification times for all users signed up for this event and ensure it is called before navigating away
+            await updateNotificationTimes(eventTime, id);
 
-          navigation.navigate(Routes.Home, {refreshNeeded: true});
-        },
-      );
+            navigation.navigate(Routes.Home, {refreshNeeded: true});
+          },
+        );
 
-      Toast.show({
-        type: 'success',
-        text1: 'Event updated successfully',
-      });
+        Toast.show({
+          type: 'success',
+          text1: 'Event updated successfully',
+        });
+      }
     } catch (error) {
       Toast.show({
         type: 'error',
@@ -419,13 +423,18 @@ const UpdatePost = ({navigation}) => {
                     title={'Update'}
                     onPress={() => {
                       const combinedEventTime = combineDateAndTime(date, time);
-                      //disable button on press to prevent spam posting the same post (reusing isUploading)
-                      setIsUploading(true);
+                      //if no location set noLocation
+                      if (!location) {
+                        setNoLocation(true);
+                      } else {
+                        //disable button on press to prevent spam posting the same post (reusing isUploading)
+                        setIsUploading(true);
+                      }
                       setTimeout(() => {
                         handleUpdate(combinedEventTime);
                       }, 1000); // Delay of 1 second for google vision
                     }}
-                    isDisabled={isUploading}
+                    isDisabled={isUploading || noLocation}
                   />
                 </View>
               </View>

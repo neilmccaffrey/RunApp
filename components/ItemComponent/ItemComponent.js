@@ -259,16 +259,17 @@ const ItemComponent = memo(
           onScroll={event => handleScroll(event, itemIndex, images.length)}
           scrollEventThrottle={16}>
           {images.map((image, index) => (
-            <FastImage
-              key={index}
-              style={styles.pictures}
-              source={{
-                uri: image.uri,
-                priority: FastImage.priority.high,
-              }}
-              resizeMode={FastImage.resizeMode.cover}
-              placeholder={<ActivityIndicator size="large" color="#0000ff" />}
-            />
+            <View key={index} style={styles.imageContainer}>
+              <FastImage
+                style={styles.pictures}
+                source={{
+                  uri: image.uri,
+                  priority: FastImage.priority.high,
+                }}
+                resizeMode={FastImage.resizeMode.contain}
+                placeholder={<ActivityIndicator size="large" color="#0000ff" />}
+              />
+            </View>
           ))}
         </ScrollView>
         {renderPagination(images.length, itemIndex)}
