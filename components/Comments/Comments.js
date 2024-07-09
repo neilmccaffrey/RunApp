@@ -3,6 +3,7 @@ import {
   faCircleArrowUp,
   faTrashCan,
   faTriangleExclamation,
+  faUserSlash,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome';
@@ -17,6 +18,7 @@ import {
   Keyboard,
   ActivityIndicator,
   Image,
+  Alert,
 } from 'react-native';
 import styles from './styles';
 import {SwipeListView} from 'react-native-swipe-list-view';
@@ -25,6 +27,7 @@ import Toast from 'react-native-toast-message';
 import {firestore} from '../../firebaseConfig';
 import {
   addCommentToPost,
+  blockUser,
   deleteComment,
   fetchComments,
   reportComment,
@@ -105,6 +108,7 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
     const isCommentOwner = renData.item.userId === user.uid;
     return (
       <View style={styles.hidden}>
+        {/* delete button */}
         <TouchableOpacity
           style={[
             styles.backRightButton,
@@ -139,8 +143,9 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
           <FontAwesomeIcon icon={faTrashCan} color={'white'} size={20} />
           <Text style={styles.textColor}>Delete</Text>
         </TouchableOpacity>
+        {/* report button */}
         <TouchableOpacity
-          style={styles.backLeftButton}
+          style={styles.backCenterButton}
           onPress={async () => {
             try {
               await reportComment(
@@ -171,6 +176,30 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
           }}>
           <FontAwesomeIcon icon={faTriangleExclamation} size={20} />
           <Text style={styles.textColor}>Report</Text>
+        </TouchableOpacity>
+        {/* block user */}
+        <TouchableOpacity
+          style={styles.backLeftButton}
+          onPress={() => {
+            Alert.alert('Block User?', 'This action cannot be undone', [
+              {
+                text: 'OK',
+                onPress: async () => {
+                  await blockUser(renData.item.userId, user.uid);
+                  Toast.show({
+                    type: 'success',
+                    text1: 'User Blocked',
+                  });
+                },
+              },
+              {
+                text: 'Cancel',
+                style: 'cancel',
+              },
+            ]);
+          }}>
+          <FontAwesomeIcon icon={faUserSlash} size={20} />
+          <Text style={styles.textColor}>Block</Text>
         </TouchableOpacity>
       </View>
     );
@@ -218,7 +247,7 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
                 data={comments}
                 keyExtractor={item => item.commentId.toString()}
                 renderHiddenItem={renderHiddenItem}
-                rightOpenValue={-150}
+                rightOpenValue={-160}
                 renderItem={({item}) => {
                   return (
                     <View style={[styles.commentContainer, styles.border]}>

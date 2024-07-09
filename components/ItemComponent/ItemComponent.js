@@ -9,11 +9,13 @@ import {
   FlatList,
   ActivityIndicator,
   Image,
+  Alert,
 } from 'react-native';
 import styles from './styles';
 import ShowMore from '../ShowMore/ShowMore';
 import Toast from 'react-native-toast-message';
 import {
+  blockUser,
   deleteNotifications,
   deletePostFromFirestore,
   fetchDisplayName,
@@ -26,6 +28,7 @@ import {
   faPenToSquare,
   faTrashCan,
   faTriangleExclamation,
+  faUserSlash,
   faXmark,
 } from '@fortawesome/free-solid-svg-icons';
 import {useAuth} from '../../contexts/AuthProvider';
@@ -439,6 +442,34 @@ const ItemComponent = memo(
                     color={'red'}
                   />
                   <Text style={styles.modalOptionsText}>Report Post</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.modalOptions}
+                  onPress={() => {
+                    Alert.alert('Block User?', 'This action cannot be undone', [
+                      {
+                        text: 'OK',
+                        onPress: async () => {
+                          await blockUser(item.userId, user.uid);
+                          setReportModalVisible(false);
+                          Toast.show({
+                            type: 'success',
+                            text1: 'User Blocked',
+                          });
+                        },
+                      },
+                      {
+                        text: 'Cancel',
+                        style: 'cancel',
+                      },
+                    ]);
+                  }}>
+                  <FontAwesomeIcon
+                    icon={faUserSlash}
+                    size={30}
+                    color={'grey'}
+                  />
+                  <Text style={styles.modalOptionsText}>Block User</Text>
                 </TouchableOpacity>
               </View>
             </View>

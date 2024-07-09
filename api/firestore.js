@@ -542,3 +542,22 @@ export const isBanned = async userId => {
     return false;
   }
 };
+
+//block user
+export const blockUser = async (blockedId, blockerId) => {
+  try {
+    const userRef = firestore().collection('users');
+
+    // Add the blockerId to the blocked array of the blocked user
+    await userRef.doc(blockedId).update({
+      blocked: firestore.FieldValue.arrayUnion(blockerId),
+    });
+
+    // Add the blockedId to the blocked array of the blocker user
+    await userRef.doc(blockerId).update({
+      blocked: firestore.FieldValue.arrayUnion(blockedId),
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
+};
