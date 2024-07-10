@@ -32,6 +32,7 @@ import {
   PanGestureHandler,
   State,
 } from 'react-native-gesture-handler';
+import {moderateText} from '../../api/moderateText';
 
 const Post = ({navigation}) => {
   const [title, setTitle] = useState('');
@@ -137,24 +138,64 @@ const Post = ({navigation}) => {
     return combinedDate;
   };
 
-  const handlePress = eventTime => {
+  const handlePress = async eventTime => {
     if (!location) {
       setNoLocation(true);
     } else {
-      createPost(
-        user,
-        title,
-        location,
-        details,
-        eventTime,
-        photo1,
-        photo2,
-        photo3,
-        photoURL,
-        () => {
-          navigation.navigate(Routes.Home, {refreshNeeded: true});
-        },
-      );
+      // Moderate the text fields
+      try {
+        const combinedText = `${title} ${location} ${details}`;
+        const analysis = await moderateText(combinedText);
+
+        // Check for offensive content
+        const attributesToCheck = {
+          TOXICITY: 0.8,
+          SEVERE_TOXICITY: 0.8,
+          IDENTITY_ATTACK: 0.6,
+          INSULT: 0.6,
+          PROFANITY: 1.0,
+          THREAT: 0.8,
+        };
+
+        const isOffensive = Object.keys(attributesToCheck).some(attribute => {
+          return (
+            analysis.attributeScores[attribute]?.summaryScore.value >=
+            attributesToCheck[attribute]
+          );
+        });
+
+        if (isOffensive) {
+          Toast.show({
+            type: 'error',
+            text1: 'Your post contains offensive content.',
+            text2: 'Please modify it and post again',
+          });
+          setIsUploading(false);
+          return;
+        }
+
+        // If text is safe, proceed to create the post
+        createPost(
+          user,
+          title,
+          location,
+          details,
+          eventTime,
+          photo1,
+          photo2,
+          photo3,
+          photoURL,
+          () => {
+            navigation.navigate(Routes.Home, {refreshNeeded: true});
+          },
+        );
+      } catch (error) {
+        Toast.show({
+          type: 'error',
+          text1: error.message,
+        });
+        setIsUploading(false);
+      }
     }
   };
 

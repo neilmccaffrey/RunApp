@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     color: '#36454F',
   },
   postFooterContainer: {
-    marginVertical: verticalScale(10),
+    marginVertical: verticalScale(5),
     marginHorizontal: horizontalScale(20),
     flexDirection: 'row',
     alignItems: 'center',

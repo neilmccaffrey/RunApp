@@ -37,6 +37,7 @@ import {useAuth} from '../../contexts/AuthProvider';
 import uuid from 'react-native-uuid';
 import globalStyle from '../../Styles/globalStyle';
 import FastImage from 'react-native-fast-image';
+import {moderateText} from '../../api/moderateText';
 
 // Fetch blocked users and filter comments
 const loadAndFilterComments = async (postId, userId) => {
@@ -86,6 +87,35 @@ const Comments = ({isOpen, onClose, postItem, onCommentAdded}) => {
       Toast.show({
         type: 'error',
         text1: 'Comment cannot be empty',
+      });
+      return;
+    }
+
+    // Moderate the comment
+    const analysis = await moderateText(newComment);
+
+    // Check for offensive content
+    const attributesToCheck = {
+      TOXICITY: 0.8,
+      SEVERE_TOXICITY: 0.8,
+      IDENTITY_ATTACK: 0.6,
+      INSULT: 0.6,
+      PROFANITY: 1.0,
+      THREAT: 0.8,
+    };
+
+    const isOffensive = Object.keys(attributesToCheck).some(attribute => {
+      return (
+        analysis.attributeScores[attribute]?.summaryScore.value >=
+        attributesToCheck[attribute]
+      );
+    });
+
+    if (isOffensive) {
+      Toast.show({
+        type: 'error',
+        text1: 'Your comment contains offensive content.',
+        text2: 'Please modify it and try again',
       });
       return;
     }

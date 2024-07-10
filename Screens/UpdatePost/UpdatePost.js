@@ -36,6 +36,7 @@ import {
   State,
 } from 'react-native-gesture-handler';
 import {Routes} from '../../navigation/Routes';
+import {moderateText} from '../../api/moderateText';
 
 const UpdatePost = ({navigation}) => {
   const route = useRoute();
@@ -162,31 +163,61 @@ const UpdatePost = ({navigation}) => {
       if (!location) {
         setNoLocation(true);
       } else {
-        await updatePostInFirestore(
-          {
-            id,
-            title,
-            location,
-            details,
-            eventTime,
-            photo1: photo1,
-            photo2: photo2,
-            photo3: photo3,
-            photoURL,
-            user,
-          },
-          async () => {
-            // Update notification times for all users signed up for this event and ensure it is called before navigating away
-            await updateNotificationTimes(eventTime, id);
+        // Moderate the text fields
+        const combinedText = `${title} ${location} ${details}`;
+        const analysis = await moderateText(combinedText);
 
-            navigation.navigate(Routes.Home, {refreshNeeded: true});
-          },
-        );
+        // Check for offensive content
+        const attributesToCheck = {
+          TOXICITY: 0.8,
+          SEVERE_TOXICITY: 0.8,
+          IDENTITY_ATTACK: 0.6,
+          INSULT: 0.6,
+          PROFANITY: 1.0,
+          THREAT: 0.8,
+        };
 
-        Toast.show({
-          type: 'success',
-          text1: 'Event updated successfully',
+        const isOffensive = Object.keys(attributesToCheck).some(attribute => {
+          return (
+            analysis.attributeScores[attribute]?.summaryScore.value >=
+            attributesToCheck[attribute]
+          );
         });
+
+        if (isOffensive) {
+          Toast.show({
+            type: 'error',
+            text1: 'Your post contains offensive content.',
+            text2: 'Please modify it and post again',
+          });
+          setIsUploading(false);
+          return;
+        } else {
+          await updatePostInFirestore(
+            {
+              id,
+              title,
+              location,
+              details,
+              eventTime,
+              photo1: photo1,
+              photo2: photo2,
+              photo3: photo3,
+              photoURL,
+              user,
+            },
+            async () => {
+              // Update notification times for all users signed up for this event and ensure it is called before navigating away
+              await updateNotificationTimes(eventTime, id);
+
+              navigation.navigate(Routes.Home, {refreshNeeded: true});
+            },
+          );
+          Toast.show({
+            type: 'success',
+            text1: 'Event updated successfully',
+          });
+        }
       }
     } catch (error) {
       Toast.show({
