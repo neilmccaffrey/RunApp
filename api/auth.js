@@ -14,15 +14,7 @@ export const signUpWithEmailAndPassword = async (email, password) => {
       email: user.email,
       createdAt: firestore.FieldValue.serverTimestamp(),
     });
-  } catch (error) {
-    throw error;
-  }
-};
-
-// Login function
-export const signInWithEmailAndPassword = async (email, password) => {
-  try {
-    await auth().signInWithEmailAndPassword(email, password);
+    return userCredential;
   } catch (error) {
     throw error;
   }

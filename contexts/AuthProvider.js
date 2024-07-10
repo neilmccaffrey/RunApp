@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import FastImage from 'react-native-fast-image';
 import {deleteProfilePhotoFromStorage} from '../api/storage';
 import firestore from '@react-native-firebase/firestore';
+import {signUpWithEmailAndPassword} from '../api/auth';
 
 // Create AuthContext
 export const AuthContext = createContext();
@@ -131,6 +132,30 @@ export const AuthProvider = ({children}) => {
     }
   };
 
+  const signUp = async (email, password) => {
+    setAuthenticating(true);
+    try {
+      const userCredential = await signUpWithEmailAndPassword(email, password);
+      const user = userCredential.user;
+      setUser(user);
+      setDisplayName('');
+      setPhotoURL(null);
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+
+      Toast.show({
+        type: 'success',
+        text1: 'Sign up successful. Welcome!',
+      });
+    } catch (error) {
+      console.log(error.message);
+      Toast.show({
+        type: 'error',
+        text1: error.message,
+      });
+      setAuthenticating(false);
+      throw error;
+    }
+  };
   // Update user profile function
   const updateUserProfile = async (newDisplayName, newPhotoURL) => {
     try {
@@ -177,6 +202,7 @@ export const AuthProvider = ({children}) => {
       value={{
         user,
         login,
+        signUp,
         initializing,
         photoURL,
         displayName,

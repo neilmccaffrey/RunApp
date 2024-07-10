@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   imageContainer: {
-    maxHeight: verticalScale(240),
+    height: verticalScale(240),
     width: width - horizontalScale(10),
     marginHorizontal: horizontalScale(5),
     marginTop: verticalScale(10),
