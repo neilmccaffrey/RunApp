@@ -16,9 +16,16 @@ export const moderateText = async text => {
           PROFANITY: {},
           THREAT: {},
         },
+        languages: ['en'],
         doNotStore: true, // Prevents storing the data on Perspective API servers
       },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
     );
+
     return response.data;
   } catch (error) {
     console.error('Error during text moderation:', error);

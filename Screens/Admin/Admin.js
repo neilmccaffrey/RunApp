@@ -20,6 +20,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {
   banUser,
+  deleteNotifications,
   deletePostFromFirestore,
   deleteReportedComment,
   deleteReportedPost,
@@ -107,6 +108,7 @@ const Admin = () => {
       if (item.photo3) {
         deletePhoto(item.photo3.path);
       }
+      await deleteNotifications(item.postId);
       await deletePostFromFirestore(item.postId);
       await deleteReportedPost(docId);
     } catch (error) {

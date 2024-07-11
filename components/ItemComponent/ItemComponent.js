@@ -128,11 +128,11 @@ const ItemComponent = memo(
         if (item.photo3) {
           deletePhoto(item.photo3.path);
         }
-        //delete post
-        await deletePostFromFirestore(item.id);
-
         //delete notification for all who signed up
         await deleteNotifications(item.id);
+
+        //delete post
+        await deletePostFromFirestore(item.id);
 
         onDelete(item.id); // Notify parent component to update the list
         setModalVisible(false);
