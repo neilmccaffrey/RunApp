@@ -33,7 +33,7 @@ const SignUp = ({navigation}) => {
   const [isEulaVisible, setIsEulaVisible] = useState(false);
   const [isEulaChecked, setIsEulaChecked] = useState(false);
 
-  const {signUp, user} = useAuth();
+  const {signUp} = useAuth();
 
   const handleSignUp = async () => {
     setIsEulaVisible(true);

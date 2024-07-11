@@ -14,6 +14,7 @@ import FastImage from 'react-native-fast-image';
 import {deleteProfilePhotoFromStorage} from '../api/storage';
 import firestore from '@react-native-firebase/firestore';
 import {signUpWithEmailAndPassword} from '../api/auth';
+import {getDeviceToken} from '../api/notifications';
 
 // Create AuthContext
 export const AuthContext = createContext();
@@ -34,15 +35,25 @@ export const AuthProvider = ({children}) => {
         const initialName = await fetchInitialDisplayName(user);
         const initialPhoto = await fetchProfilePhoto(user);
         const admin = await fetchAdminStatus(user);
+
         setUser(user);
         setDisplayName(initialName);
         setPhotoURL(initialPhoto);
         setIsAdmin(admin);
+
         await AsyncStorage.setItem('user', JSON.stringify(user));
 
         // Preload and cache the profile photo
         if (initialPhoto) {
           FastImage.preload([{uri: initialPhoto}]);
+        }
+
+        // Fetch and update the FCM token
+        if (admin) {
+          const fcmToken = await getDeviceToken();
+          await firestore().collection('adminTokens').doc(user.uid).set({
+            fcmToken: fcmToken,
+          });
         }
       } catch (error) {
         Toast.show({

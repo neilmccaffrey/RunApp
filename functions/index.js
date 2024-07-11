@@ -5,6 +5,7 @@ const moment = require('moment-timezone');
 
 admin.initializeApp();
 
+//event notifications
 exports.sendScheduledNotifications = functions.pubsub
   .schedule('every 10 minutes')
   .onRun(async context => {
@@ -61,6 +62,7 @@ async function sendNotification(deviceToken, message) {
     });
 }
 
+//moderate images
 const client = new vision.ImageAnnotatorClient({
   keyFilename: 'run401-fe9b3-fce98b8bf623.json', //path to JSON file
 });
@@ -98,3 +100,53 @@ exports.moderateImage = functions.storage.object().onFinalize(async object => {
     console.error('Error during SafeSearchDetection:', error);
   }
 });
+
+//send notifications to admins for comment and post reports
+exports.notifyAdminsOnReport = functions.firestore
+  .document('reportedPosts/{reportId}')
+  .onCreate(async () => {
+    await sendAdminNotification('post');
+  });
+
+exports.notifyAdminsOnCommentReport = functions.firestore
+  .document('reportedComments/{reportId}')
+  .onCreate(async () => {
+    await sendAdminNotification('comment');
+  });
+
+async function sendAdminNotification(type) {
+  // Fetch admin tokens
+  const adminTokensSnapshot = await admin
+    .firestore()
+    .collection('adminTokens')
+    .get();
+
+  const tokens = [];
+  adminTokensSnapshot.forEach(doc => {
+    const tokenData = doc.data();
+    if (tokenData.fcmToken) {
+      tokens.push(tokenData.fcmToken);
+    }
+  });
+
+  if (tokens.length > 0) {
+    const payload = {
+      notification: {
+        title: 'New Report',
+        body: `A new ${type} report has been submitted`,
+      },
+      apns: {
+        payload: {
+          aps: {
+            'content-available': 1,
+          },
+        },
+      },
+    };
+    const messages = tokens.map(token => ({
+      ...payload,
+      token,
+    }));
+    await admin.messaging().sendEach(messages);
+  }
+}

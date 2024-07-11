@@ -412,7 +412,8 @@ export const fetchAdminStatus = async user => {
     const userDoc = await firestore().collection('users').doc(user.uid).get();
     if (userDoc.exists) {
       const userData = userDoc.data();
-      return userData.isAdmin;
+
+      return userData.isAdmin || false;
     }
   } catch (error) {
     throw error;
