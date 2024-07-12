@@ -29,7 +29,7 @@ exports.sendScheduledNotifications = functions.pubsub
 
       const notificationMessage = `Tomorrow ${signup.eventLocation} @${localEventTime}!`;
       await sendNotification(signup.deviceToken, notificationMessage);
-      batch.update(doc.ref, {notified: true}); // Mark as notified
+      batch.delete(doc.ref); // Delete the document
     });
 
     await Promise.all(notificationsPromises);
