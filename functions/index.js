@@ -64,7 +64,7 @@ async function sendNotification(deviceToken, message) {
 
 //moderate images
 const client = new vision.ImageAnnotatorClient({
-  keyFilename: 'run401-fe9b3-fce98b8bf623.json', //path to JSON file
+  keyFilename: 'run401-fe9b3-8568ec98fb57.json', //path to JSON file
 });
 
 exports.moderateImage = functions.storage.object().onFinalize(async object => {
