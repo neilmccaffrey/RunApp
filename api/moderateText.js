@@ -1,7 +1,5 @@
 import axios from 'axios';
 
-const PERSPECTIVE_API_KEY = 'AIzaSyCvdtMNA6tWsRzBX9N_jTVgjdPHObsIcUg';
-
 export const moderateText = async text => {
   try {
     const response = await axios.post(
